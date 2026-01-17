@@ -20,6 +20,8 @@ This project is in active development. Authentication, database integration, and
 - ASP.NET Core Identity
 - Docker & Docker Compose
 - Scalar API Documentation
+- Serilog (Structured Logging)
+- xUnit (Testing Framework)
 
 ## Features
 
@@ -29,6 +31,11 @@ This project is in active development. Authentication, database integration, and
 - OpenAPI/Swagger documentation with Scalar UI
 - Dockerized application and database
 - Environment-based configuration
+- Health checks for monitoring
+- Structured logging with Serilog
+- Comprehensive test suite with xUnit
+- GitHub Actions CI/CD pipeline
+- Code formatting standards with .editorconfig
 
 ## Getting Started
 
@@ -95,8 +102,9 @@ dotnet run --project RoundsApp
 ## API Documentation
 
 Once the application is running, access the API documentation at:
-- Scalar UI: `http://localhost:5000/scalar/v1`
-- OpenAPI JSON: `http://localhost:5000/openapi/v1.json`
+- Scalar UI: `http://localhost:5001/scalar/v1`
+- OpenAPI JSON: `http://localhost:5001/openapi/v1.json`
+- Health Check: `http://localhost:5001/health`
 
 ## Configuration
 
@@ -122,6 +130,18 @@ Key configuration options in `.env`:
 
 ## Development
 
+### Running Tests
+
+Run all tests:
+```bash
+dotnet test
+```
+
+Run tests with coverage:
+```bash
+dotnet test /p:CollectCoverage=true
+```
+
 ### Database Migrations
 
 Create a new migration:
@@ -134,10 +154,56 @@ Apply migrations:
 dotnet ef database update --project RoundsApp
 ```
 
+### Logging
+
+Logs are written to:
+- Console output (all environments)
+- `logs/rounds-api-{Date}.txt` files (rolling daily)
+
+### Code Style
+
+This project uses `.editorconfig` for consistent code formatting. The CI pipeline enforces code style checks.
+
+To format code:
+```bash
+dotnet format
+```
+
+### CI/CD
+
+The project uses GitHub Actions for continuous integration:
+- **Build and Test**: Runs on every push and pull request
+- **Code Quality**: Checks code formatting and builds with warnings as errors
+- **Docker Build**: Validates Docker image builds
+
 ### Project Structure
 
 - `RoundsApp/` - Main API project
-  - Controllers, models, services, and database context
+  - `Data/` - Database context and configurations
+  - `DTOs/` - Data transfer objects
+  - `Endpoints/` - Minimal API endpoints
+  - `Migrations/` - EF Core migrations
+  - `Models/` - Domain models
+  - `Services/` - Business logic and services
+- `RoundsApp.Tests/` - Test project
+  - Unit and integration tests
+- `.github/` - GitHub Actions workflows and templates
+  - `workflows/` - CI/CD pipelines
+  - `ISSUE_TEMPLATE/` - Issue templates
+  - `pull_request_template.md` - PR template
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please ensure:
+- All tests pass
+- Code follows the project's style guidelines
+- Documentation is updated as needed
 
 ## License
 
