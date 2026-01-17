@@ -1,3 +1,7 @@
+// <copyright file="Program.cs" company="RoundsApp">
+// Copyright (c) RoundsApp. All rights reserved.
+// </copyright>
+
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -58,7 +62,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
     };
 });
 
@@ -72,7 +76,7 @@ builder.Services.AddOpenApi();
 
 // Add Health Checks
 builder.Services.AddHealthChecks()
-    .AddNpgSql(builder.Configuration.GetConnectionString("DefaultConnection")!);
+    .AddNpgSql(builder.Configuration.GetConnectionString("DefaultConnection") !);
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -111,4 +115,6 @@ app.MapHealthChecks("/health");
 app.Run();
 
 // Make the implicit Program class public for testing
-public partial class Program { }
+public partial class Program
+{
+}

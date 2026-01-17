@@ -1,19 +1,23 @@
+// <copyright file="AuthenticationEndpointsTests.cs" company="RoundsApp">
+// Copyright (c) RoundsApp. All rights reserved.
+// </copyright>
+
+using System.Net;
+using System.Net.Http.Json;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using RoundsApp.DTOs;
-using System.Net;
-using System.Net.Http.Json;
 using Xunit;
 
 namespace RoundsApp.Tests;
 
 public class AuthenticationEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
 {
-    private readonly HttpClient _client;
+    private readonly HttpClient client;
 
     public AuthenticationEndpointsTests(WebApplicationFactory<Program> factory)
     {
-        _client = factory.CreateClient();
+        this.client = factory.CreateClient();
     }
 
     [Fact]
@@ -26,11 +30,11 @@ public class AuthenticationEndpointsTests : IClassFixture<WebApplicationFactory<
             Password = "Test123!@#",
             FirstName = "Test",
             LastName = "User",
-            UserName = $"testuser{Guid.NewGuid().ToString()[..8]}"
+            UserName = $"testuser{Guid.NewGuid().ToString()[..8]}",
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/auth/register", registerRequest);
+        var response = await this.client.PostAsJsonAsync("/api/auth/register", registerRequest);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -46,11 +50,11 @@ public class AuthenticationEndpointsTests : IClassFixture<WebApplicationFactory<
             Password = "Test123!@#",
             FirstName = "Test",
             LastName = "User",
-            UserName = "testuser"
+            UserName = "testuser",
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/auth/register", registerRequest);
+        var response = await this.client.PostAsJsonAsync("/api/auth/register", registerRequest);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -69,19 +73,19 @@ public class AuthenticationEndpointsTests : IClassFixture<WebApplicationFactory<
             Password = password,
             FirstName = "Test",
             LastName = "User",
-            UserName = $"testuser{Guid.NewGuid().ToString()[..8]}"
+            UserName = $"testuser{Guid.NewGuid().ToString()[..8]}",
         };
 
-        await _client.PostAsJsonAsync("/api/auth/register", registerRequest);
+        await this.client.PostAsJsonAsync("/api/auth/register", registerRequest);
 
         var loginRequest = new LoginRequest
         {
             Email = email,
-            Password = password
+            Password = password,
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
+        var response = await this.client.PostAsJsonAsync("/api/auth/login", loginRequest);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -97,11 +101,11 @@ public class AuthenticationEndpointsTests : IClassFixture<WebApplicationFactory<
         var loginRequest = new LoginRequest
         {
             Email = "nonexistent@example.com",
-            Password = "WrongPassword123!"
+            Password = "WrongPassword123!",
         };
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
+        var response = await this.client.PostAsJsonAsync("/api/auth/login", loginRequest);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);

@@ -1,3 +1,7 @@
+// <copyright file="AuthEndpoints.cs" company="RoundsApp">
+// Copyright (c) RoundsApp. All rights reserved.
+// </copyright>
+
 using Microsoft.AspNetCore.Identity;
 using RoundsApp.DTOs;
 using RoundsApp.Models;
@@ -32,7 +36,7 @@ public static class AuthEndpoints
             UserName = request.UserName ?? request.Email,
             Email = request.Email,
             FirstName = request.FirstName,
-            LastName = request.LastName
+            LastName = request.LastName,
         };
 
         var result = await userManager.CreateAsync(user, request.Password);
@@ -51,7 +55,7 @@ public static class AuthEndpoints
             Email = user.Email ?? string.Empty,
             FirstName = user.FirstName ?? string.Empty,
             LastName = user.LastName ?? string.Empty,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(jwtSettings["ExpiryInMinutes"] ?? "60"))
+            ExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(jwtSettings["ExpiryInMinutes"] ?? "60")),
         });
     }
 
@@ -80,7 +84,7 @@ public static class AuthEndpoints
             Email = user.Email ?? string.Empty,
             FirstName = user.FirstName ?? string.Empty,
             LastName = user.LastName ?? string.Empty,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(jwtSettings["ExpiryInMinutes"] ?? "60"))
+            ExpiresAt = DateTime.UtcNow.AddMinutes(int.Parse(jwtSettings["ExpiryInMinutes"] ?? "60")),
         });
     }
 }

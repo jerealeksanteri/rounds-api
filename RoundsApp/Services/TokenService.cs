@@ -1,3 +1,7 @@
+// <copyright file="TokenService.cs" company="RoundsApp">
+// Copyright (c) RoundsApp. All rights reserved.
+// </copyright>
+
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -8,16 +12,16 @@ namespace RoundsApp.Services;
 
 public class TokenService : ITokenService
 {
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration configuration;
 
     public TokenService(IConfiguration configuration)
     {
-        _configuration = configuration;
+        this.configuration = configuration;
     }
 
     public string GenerateToken(ApplicationUser user)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
+        var jwtSettings = this.configuration.GetSection("JwtSettings");
         var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey is not configured");
         var issuer = jwtSettings["Issuer"] ?? "RoundsAPI";
         var audience = jwtSettings["Audience"] ?? "RoundsApp";
@@ -33,7 +37,7 @@ public class TokenService : ITokenService
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim("firstName", user.FirstName ?? string.Empty),
-            new Claim("lastName", user.LastName ?? string.Empty)
+            new Claim("lastName", user.LastName ?? string.Empty),
         };
 
         var token = new JwtSecurityToken(
@@ -41,8 +45,7 @@ public class TokenService : ITokenService
             audience: audience,
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(expiryInMinutes),
-            signingCredentials: credentials
-        );
+            signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }

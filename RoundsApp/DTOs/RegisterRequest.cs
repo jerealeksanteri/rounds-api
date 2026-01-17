@@ -1,3 +1,7 @@
+// <copyright file="RegisterRequest.cs" company="RoundsApp">
+// Copyright (c) RoundsApp. All rights reserved.
+// </copyright>
+
 using System.ComponentModel.DataAnnotations;
 
 namespace RoundsApp.DTOs;

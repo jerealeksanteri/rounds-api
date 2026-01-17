@@ -1,3 +1,7 @@
+// <copyright file="ApplicationDbContext.cs" company="RoundsApp">
+// Copyright (c) RoundsApp. All rights reserved.
+// </copyright>
+
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using RoundsApp.Models;
