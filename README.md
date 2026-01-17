@@ -211,4 +211,5 @@ See [LICENSE](LICENSE) file for details.
 
 ## Contact
 
-TBD
+@jerealeksanteri 
+janiemi@hotmail.fi
