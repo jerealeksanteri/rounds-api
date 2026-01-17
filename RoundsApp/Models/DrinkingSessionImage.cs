@@ -1,3 +1,6 @@
+// <copyright file="DrinkingSessionImage.cs" company="RoundsApp">
+// Copyright (c) RoundsApp. All rights reserved.
+// </copyright>
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace RoundsApp.Models;

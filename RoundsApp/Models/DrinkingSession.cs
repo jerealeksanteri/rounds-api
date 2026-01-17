@@ -1,3 +1,7 @@
+// <copyright file="DrinkingSession.cs" company="RoundsApp">
+// Copyright (c) RoundsApp. All rights reserved.
+// </copyright>
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace RoundsApp.Models;
@@ -17,11 +21,13 @@ public class DrinkingSession
     [MaxLength(1000)]
     public string? Description { get; set; }
 
-    [Required]
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? ScheduledAt { get; set; }
 
     public List<SessionParticipation> Participants { get; set; } = new List<SessionParticipation>();
     public List<DrinkingSessionImage> Images { get; set; } = new List<DrinkingSessionImage>();
+
+    [Required]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [Required]
     [ForeignKey("CreatedBy")]
