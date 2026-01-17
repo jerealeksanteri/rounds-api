@@ -21,24 +21,11 @@ public class AuthenticationEndpointsTests : IClassFixture<WebApplicationFactory<
     {
         var customFactory = factory.WithWebHostBuilder(builder =>
         {
-            builder.ConfigureAppConfiguration((context, config) =>
-            {
-                // Clear existing configuration sources to ensure our values take precedence
-                config.Sources.Clear();
-
-                // Add our test configuration
-                config.AddInMemoryCollection(new Dictionary<string, string?>
-                {
-                    ["JwtSettings:SecretKey"] = "test-secret-key-for-testing-purposes-only-minimum-32-chars",
-                    ["JwtSettings:Issuer"] = "RoundsAppTest",
-                    ["JwtSettings:Audience"] = "RoundsAppTestAudience",
-                    ["JwtSettings:ExpiryMinutes"] = "60",
-                    ["ConnectionStrings:DefaultConnection"] = "Host=localhost;Port=5432;Database=roundsdb_test;Username=roundsuser;Password=roundspassword",
-                });
-
-                // Add environment variables and other standard sources
-                config.AddEnvironmentVariables();
-            });
+            builder.UseSetting("JwtSettings:SecretKey", "test-secret-key-for-testing-purposes-only-minimum-32-chars");
+            builder.UseSetting("JwtSettings:Issuer", "RoundsAppTest");
+            builder.UseSetting("JwtSettings:Audience", "RoundsAppTestAudience");
+            builder.UseSetting("JwtSettings:ExpiryMinutes", "60");
+            builder.UseSetting("ConnectionStrings:DefaultConnection", "Host=localhost;Port=5432;Database=roundsdb_test;Username=roundsuser;Password=roundspassword");
 
             builder.UseEnvironment("Test");
         });
