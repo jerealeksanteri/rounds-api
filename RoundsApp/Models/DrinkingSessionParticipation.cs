@@ -8,7 +8,7 @@ namespace RoundsApp.Models;
 /// <summary>
 /// Represents a participant in a drinking session.
 /// </summary>
-public class SessionParticipation
+public class DrinkingSessionParticipation
 {
     [Key]
     public Guid Id { get; set; } = Guid.NewGuid();
@@ -28,7 +28,7 @@ public class SessionParticipation
     [Required]
     public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
 
-    public List<SessionParticipationDrink> Drinks { get; set; } = new List<SessionParticipationDrink>();
+    public List<DrinkingSessionParticipationDrink> Drinks { get; set; } = new List<DrinkingSessionParticipationDrink>();
 
     [Required]
     [ForeignKey("CreatedBy")]

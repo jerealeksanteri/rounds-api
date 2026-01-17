@@ -8,15 +8,15 @@ namespace RoundsApp.Models;
 /// <summary>
 /// Represents a drink consumed by a participant in a drinking session.
 /// </summary>
-public class SessionParticipationDrink
+public class DrinkingSessionParticipationDrink
 {
     [Key]
     public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required]
-    [ForeignKey("SessionParticipation")]
-    public Guid SessionParticipationId { get; set; }
-    public SessionParticipation? SessionParticipation { get; set; }
+    [ForeignKey("DrinkingSessionParticipation")]
+    public Guid DrinkingSessionParticipationId { get; set; }
+    public DrinkingSessionParticipation? DrinkingSessionParticipation { get; set; }
 
     [Required]
     [ForeignKey("Drink")]

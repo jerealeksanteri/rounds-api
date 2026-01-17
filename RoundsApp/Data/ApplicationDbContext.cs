@@ -24,5 +24,25 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         {
             entity.ToTable(name: "Users");
         });
+
+        builder.Entity<DrinkingSession>(entity =>
+        {
+            entity.ToTable(name: "DrinkingSessions");
+        });
+
+        builder.Entity<SessionParticipation>(entity =>
+        {
+            entity.ToTable(name: "SessionParticipations");
+        });
+
+        builder.Entity<DrinkingSessionImage>(entity =>
+        {
+            entity.ToTable(name: "DrinkingSessionImages");
+        });
+
+        builder.Entity<SessionParticipationDrink>(entity =>
+        {
+            entity.ToTable(name: "SessionParticipationDrinks");
+        });
     }
 }

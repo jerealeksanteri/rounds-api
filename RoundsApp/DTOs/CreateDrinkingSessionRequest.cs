@@ -15,4 +15,6 @@ public class CreateDrinkingSessionRequest
     public string? Description { get; set; }
 
     public DateTime? ScheduledAt { get; set; }
+
+    public List<Guid> ParticipantIds { get; set; } = new List<Guid>();
 }
