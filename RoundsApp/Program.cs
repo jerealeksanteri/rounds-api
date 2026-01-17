@@ -8,8 +8,19 @@ using RoundsApp.Endpoints;
 using RoundsApp.Models;
 using RoundsApp.Services;
 using Scalar.AspNetCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("logs/rounds-api-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add Database Context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
