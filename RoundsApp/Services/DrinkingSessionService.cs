@@ -35,7 +35,7 @@ public class DrinkingSessionService : IDrinkingSessionService
         return drinkingSession;
     }
 
-    public async Task<DrinkingSession> UpdateDrinkingSessionAsync(Guid sessionId, CreateDrinkingSessionRequest session, Guid updatedById)
+    public async Task<DrinkingSession> UpdateDrinkingSessionAsync(Guid sessionId, CreateDrinkingSessionRequest session, Guid userId)
     {
         var existingSession = await this.context.DrinkingSessions.FindAsync(sessionId);
         if (existingSession == null)
@@ -43,15 +43,39 @@ public class DrinkingSessionService : IDrinkingSessionService
             throw new InvalidOperationException($"Drinking session with ID {sessionId} not found");
         }
 
+        if (existingSession.CreatedById != userId)
+        {
+            throw new UnauthorizedAccessException("Only the creator can update the drinking session");
+        }
+
         existingSession.Title = session.Name;
         existingSession.Description = session.Description;
         existingSession.ScheduledAt = session.ScheduledAt;
-        existingSession.UpdatedById = updatedById;
+        existingSession.UpdatedById = userId;
         existingSession.UpdatedAt = DateTime.UtcNow;
 
         await this.context.SaveChangesAsync();
 
         return existingSession;
+    }
+
+    public async Task<bool> DeleteDrinkingSessionAsync(Guid sessionId, Guid userId)
+    {
+        var session = await this.context.DrinkingSessions.FindAsync(sessionId);
+        if (session == null)
+        {
+            return false;
+        }
+
+        if (session.CreatedById != userId)
+        {
+            throw new UnauthorizedAccessException("Only the creator can delete the drinking session");
+        }
+
+        this.context.DrinkingSessions.Remove(session);
+        await this.context.SaveChangesAsync();
+
+        return true;
     }
 
     public async Task<DrinkingSession?> GetDrinkingSessionByIdAsync(Guid sessionId)
@@ -102,10 +126,21 @@ public class DrinkingSessionService : IDrinkingSessionService
         return true;
     }
 
-    public async Task<bool> RemoveParticipantAsync(Guid sessionId, Guid userId, Guid removedById)
+    public async Task<bool> RemoveParticipantAsync(Guid sessionId, Guid participantId, Guid userId)
     {
+        var session = await this.context.DrinkingSessions.FindAsync(sessionId);
+        if (session == null)
+        {
+            return false;
+        }
+
+        if (session.CreatedById != userId)
+        {
+            throw new UnauthorizedAccessException("Only the creator can remove participants");
+        }
+
         var participation = await this.context.DrinkingSessionParticipations
-            .FirstOrDefaultAsync(p => p.DrinkingSessionId == sessionId && p.UserId == userId);
+            .FirstOrDefaultAsync(p => p.DrinkingSessionId == sessionId && p.Id == participantId);
 
         if (participation == null)
         {
@@ -148,12 +183,19 @@ public class DrinkingSessionService : IDrinkingSessionService
         return true;
     }
 
-    public async Task<bool> DeleteImageAsync(Guid imageId, Guid deletedById)
+    public async Task<bool> DeleteImageAsync(Guid imageId, Guid userId)
     {
-        var image = await this.context.DrinkingSessionImages.FindAsync(imageId);
+        var image = await this.context.DrinkingSessionImages
+            .Include(i => i.DrinkingSession)
+            .FirstOrDefaultAsync(i => i.Id == imageId);
         if (image == null)
         {
             return false;
+        }
+
+        if (image.DrinkingSession!.CreatedById != userId)
+        {
+            throw new UnauthorizedAccessException("Only the session creator can delete images");
         }
 
         this.context.DrinkingSessionImages.Remove(image);
@@ -192,14 +234,21 @@ public class DrinkingSessionService : IDrinkingSessionService
         return true;
     }
 
-    public async Task<bool> RemoveDrinkAsync(Guid sessionParticipationDrinkId)
+    public async Task<bool> RemoveDrinkAsync(Guid sessionParticipationDrinkId, Guid userId)
     {
         var participationDrink = await this.context.DrinkingSessionParticipationDrinks
-            .FindAsync(sessionParticipationDrinkId);
+            .Include(d => d.DrinkingSessionParticipation)
+                .ThenInclude(p => p.DrinkingSession)
+            .FirstOrDefaultAsync(d => d.Id == sessionParticipationDrinkId);
 
         if (participationDrink == null)
         {
             return false;
+        }
+
+        if (participationDrink.DrinkingSessionParticipation!.DrinkingSession!.CreatedById != userId)
+        {
+            throw new UnauthorizedAccessException("Only the session creator can remove drinks");
         }
 
         this.context.DrinkingSessionParticipationDrinks.Remove(participationDrink);
@@ -216,30 +265,6 @@ public class DrinkingSessionService : IDrinkingSessionService
             .Where(d => d.DrinkingSessionParticipation.DrinkingSessionId == sessionId
                      && d.DrinkingSessionParticipationId == participantId)
             .OrderBy(d => d.CreatedAt)
-            .ToListAsync();
-    }
-
-    public async Task<bool> DeleteDrinkingSessionAsync(Guid sessionId)
-    {
-        var session = await this.context.DrinkingSessions.FindAsync(sessionId);
-        if (session == null)
-        {
-            return false;
-        }
-
-        this.context.DrinkingSessions.Remove(session);
-        await this.context.SaveChangesAsync();
-
-        return true;
-    }
-
-    public async Task<List<DrinkingSession>> GetDrinkingSessionsByUserIdAsync(Guid userId)
-    {
-        return await this.context.DrinkingSessions
-            .Where(s => s.CreatedById == userId)
-            .Include(s => s.Participants)
-            .Include(s => s.Images)
-            .OrderByDescending(s => s.CreatedAt)
             .ToListAsync();
     }
 

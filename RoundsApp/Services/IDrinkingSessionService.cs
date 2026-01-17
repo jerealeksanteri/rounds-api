@@ -10,25 +10,19 @@ namespace RoundsApp.Services;
 public interface IDrinkingSessionService
 {
     Task<DrinkingSession> CreateDrinkingSessionAsync(CreateDrinkingSessionRequest session, Guid creatorId);
-    Task<DrinkingSession> UpdateDrinkingSessionAsync(Guid sessionId, CreateDrinkingSessionRequest session, Guid updatedById);
+    Task<DrinkingSession> UpdateDrinkingSessionAsync(Guid sessionId, CreateDrinkingSessionRequest session, Guid userId);
+    Task<bool> DeleteDrinkingSessionAsync(Guid sessionId, Guid userId);
     Task<DrinkingSession?> GetDrinkingSessionByIdAsync(Guid sessionId);
     Task<List<DrinkingSessionParticipation>> GetParticipantsAsync(Guid sessionId);
     Task<bool> AddParticipantAsync(Guid sessionId, Guid userId, Guid addedById);
-    Task<bool> RemoveParticipantAsync(Guid sessionId, Guid userId, Guid removedById);
+    Task<bool> RemoveParticipantAsync(Guid sessionId, Guid participantId, Guid userId);
     Task<List<DrinkingSessionImage>> GetImagesAsync(Guid sessionId);
     Task<bool> AddImageAsync(Guid sessionId, byte[] imageData, Guid addedById);
-    Task<bool> DeleteImageAsync(Guid imageId, Guid deletedById);
+    Task<bool> DeleteImageAsync(Guid imageId, Guid userId);
     Task<bool> RecordDrinkAsync(Guid sessionId, Guid participantId, Guid drinkId, Guid recordedById);
-    Task<bool> RemoveDrinkAsync(Guid sessionParticipationDrinkId);
+    Task<bool> RemoveDrinkAsync(Guid sessionParticipationDrinkId, Guid userId);
     Task<List<DrinkingSessionParticipationDrink>> GetParticipantDrinksAsync(Guid sessionId, Guid participantId);
-    Task<bool> DeleteDrinkingSessionAsync(Guid sessionId);
-    Task<List<DrinkingSession>> GetDrinkingSessionsByUserIdAsync(Guid userId);
     Task<List<DrinkingSession>> GetDrinkingSessionsByParticipantsIdAsync(Guid userId);
-
-    // DO NOT DDOS THE SERVER
-    // Task<List<DrinkingSession>> GetAllDrinkingSessionsAsync();
-    // NO NEED WE HAVE UPDATE METHOD
-    // Task<bool> UpdateScheduledAtAsync(Guid sessionId, DateTime? scheduledAt, Guid updatedById);
     Task<List<DrinkingSessionParticipationDrink>> GetAllDrinksInSessionAsync(Guid sessionId);
     Task<int> GetTotalDrinkCountInSessionAsync(Guid sessionId);
     Task<Dictionary<Guid, int>> GetDrinkCountsPerParticipantAsync(Guid sessionId);
