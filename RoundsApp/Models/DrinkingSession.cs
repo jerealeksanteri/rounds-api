@@ -23,7 +23,7 @@ public class DrinkingSession
 
     public DateTime? ScheduledAt { get; set; }
 
-    public List<DrinkingSessionParticipation> Participants { get; set; } = new List<SessionParticipation>();
+    public List<DrinkingSessionParticipation> Participants { get; set; } = new List<DrinkingSessionParticipation>();
     public List<DrinkingSessionImage> Images { get; set; } = new List<DrinkingSessionImage>();
 
     [Required]

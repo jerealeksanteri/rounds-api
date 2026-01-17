@@ -2,18 +2,25 @@
 // Copyright (c) RoundsApp. All rights reserved.
 // </copyright>
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using RoundsApp.Models;
 
 namespace RoundsApp.Data;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
     }
+
+    public DbSet<DrinkingSession> DrinkingSessions { get; set; }
+    public DbSet<DrinkingSessionParticipation> DrinkingSessionParticipations { get; set; }
+    public DbSet<DrinkingSessionImage> DrinkingSessionImages { get; set; }
+    public DbSet<DrinkingSessionParticipationDrink> DrinkingSessionParticipationDrinks { get; set; }
+    public DbSet<Drink> Drinks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -30,9 +37,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.ToTable(name: "DrinkingSessions");
         });
 
-        builder.Entity<SessionParticipation>(entity =>
+        builder.Entity<DrinkingSessionParticipation>(entity =>
         {
-            entity.ToTable(name: "SessionParticipations");
+            entity.ToTable(name: "DrinkingSessionParticipations");
         });
 
         builder.Entity<DrinkingSessionImage>(entity =>
@@ -40,9 +47,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.ToTable(name: "DrinkingSessionImages");
         });
 
-        builder.Entity<SessionParticipationDrink>(entity =>
+        builder.Entity<DrinkingSessionParticipationDrink>(entity =>
         {
-            entity.ToTable(name: "SessionParticipationDrinks");
+            entity.ToTable(name: "DrinkingSessionParticipationDrinks");
         });
     }
 }
