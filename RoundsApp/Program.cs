@@ -59,6 +59,10 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 // Add OpenAPI
 builder.Services.AddOpenApi();
 
+// Add Health Checks
+builder.Services.AddHealthChecks()
+    .AddNpgSql(builder.Configuration.GetConnectionString("DefaultConnection")!);
+
 // Add CORS
 builder.Services.AddCors(options =>
 {
@@ -89,6 +93,9 @@ app.UseAuthorization();
 
 // Map Endpoints
 app.MapAuthEndpoints();
+
+// Map Health Checks
+app.MapHealthChecks("/health");
 
 app.Run();
 
