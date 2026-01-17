@@ -1,0 +1,38 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+## husky task runner examples -------------------
+## Note : for local installation use 'dotnet' prefix. e.g. 'dotnet husky'
+
+## run all tasks
+#husky run
+
+### run all tasks with group: 'group-name'
+#husky run --group group-name
+
+## run task with name: 'task-name'
+#husky run --name task-name
+
+## pass hook arguments to task
+#husky run --args "$1" "$2"
+
+## or put your custom commands -------------------
+#echo 'Husky.Net is awesome!'
+
+echo "🔍 Running pre-commit checks..."
+
+# Simply run dotnet format (it will only change files if needed)
+# This is faster and simpler than --verify-no-changes
+dotnet format --verbosity quiet
+
+# Check if format made any changes to tracked files
+if ! git diff --exit-code --quiet; then
+    echo ""
+    echo "❌ Code formatting changes were made!"
+    echo "Please review the changes and stage them:"
+    echo "  git add -u"
+    echo "  git commit"
+    exit 1
+fi
+
+echo "✅ Pre-commit checks passed!"
