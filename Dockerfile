@@ -5,13 +5,14 @@ WORKDIR /src
 # Copy solution and project files
 COPY RoundsApp.sln ./
 COPY RoundsApp/RoundsApp.csproj RoundsApp/
+COPY RoundsApp.Tests/RoundsApp.Tests.csproj RoundsApp.Tests/
 COPY .config/ .config/
 COPY .editorconfig ./
 COPY .globalconfig ./
 COPY stylecop.json ./
 
 # Restore dependencies
-RUN dotnet restore
+RUN dotnet restore RoundsApp/RoundsApp.csproj
 
 # Copy the rest of the source code
 COPY . .

@@ -5,7 +5,9 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using RoundsApp.DTOs;
 using Xunit;
 
@@ -17,7 +19,22 @@ public class AuthenticationEndpointsTests : IClassFixture<WebApplicationFactory<
 
     public AuthenticationEndpointsTests(WebApplicationFactory<Program> factory)
     {
-        this.client = factory.CreateClient();
+        var customFactory = factory.WithWebHostBuilder(builder =>
+        {
+            builder.UseEnvironment("Test");
+            builder.ConfigureAppConfiguration((context, config) =>
+            {
+                config.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["JwtSettings:SecretKey"] = "test-secret-key-for-testing-purposes-only-minimum-32-chars",
+                    ["JwtSettings:Issuer"] = "RoundsAppTest",
+                    ["JwtSettings:Audience"] = "RoundsAppTestAudience",
+                    ["JwtSettings:ExpiryMinutes"] = "60",
+                });
+            });
+        });
+
+        this.client = customFactory.CreateClient();
     }
 
     [Fact]
