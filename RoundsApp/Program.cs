@@ -95,7 +95,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate();
+    await db.Database.MigrateAsync();
 }
 
 // Configure OpenAPI and Scalar
@@ -112,7 +112,7 @@ app.MapAuthEndpoints();
 // Map Health Checks
 app.MapHealthChecks("/health");
 
-app.Run();
+await app.RunAsync();
 
 // Make the implicit Program class public for testing
 public partial class Program
