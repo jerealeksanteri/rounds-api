@@ -18,6 +18,9 @@ dotnet_diagnostic.SA1309.severity = none
 # SA1101: Prefix local calls with this
 dotnet_diagnostic.SA1101.severity = none
 
+# SA1009: Closing parenthesis should be followed by a space
+dotnet_diagnostic.SA1009.severity = none
+
 # SA1516: Elements should be separated by blank line
 dotnet_diagnostic.SA1516.severity = suggestion
 

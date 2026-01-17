@@ -76,7 +76,7 @@ builder.Services.AddOpenApi();
 
 // Add Health Checks
 builder.Services.AddHealthChecks()
-    .AddNpgSql(builder.Configuration.GetConnectionString("DefaultConnection") !);
+    .AddNpgSql(builder.Configuration.GetConnectionString("DefaultConnection")!);
 
 // Add CORS
 builder.Services.AddCors(options =>
