@@ -1,5 +1,5 @@
 // <copyright file="Program.cs" company="RoundsApp">
-// Copyright (c) RoundsApp. All rights reserved.
+// Copyright (c) RoundsApp. All rights reserved. Unauthorized copying of this file, via any medium is strictly prohibited.
 // </copyright>
 
 using System.Text;
