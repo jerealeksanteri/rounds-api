@@ -247,3 +247,6 @@ dotnet_naming_style.pascal_case.required_prefix =
 dotnet_naming_style.pascal_case.required_suffix =
 dotnet_naming_style.pascal_case.word_separator =
 dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+# Adding a copyright header template for C# files
+file_header_template = "// Copyright (c) 2026 Jere Niemi. All rights reserved."
