@@ -151,16 +151,43 @@ Key configuration options in `.env`:
 - ✅ Notification system
 - ✅ Complete CRUD operations via repositories
 
-## Planned Features
+## API Endpoints
 
-### API Endpoints (In Progress)
-- Session CRUD endpoints
-- Participant and invite management
-- Comment and image upload endpoints
-- Drink catalog endpoints
-- User statistics and achievements
-- Friendship management
-- Notification delivery
+### Implemented Endpoints
+
+#### Sessions
+- ✅ Session CRUD operations (GET, POST, PUT, DELETE)
+- ✅ Get sessions by user
+- ✅ Get upcoming sessions
+- ✅ Session participant management
+- ✅ Session comment management
+
+#### Drinks & Drink Types
+- ✅ Drink CRUD operations
+- ✅ Search drinks by name
+- ✅ Filter drinks by type
+- ✅ Drink Type CRUD operations
+
+#### Social Features
+- ✅ Friendship management (send, accept, reject requests)
+- ✅ Get friends, pending, and sent requests
+- ✅ Notification system with read/unread status
+
+#### Achievements
+- ✅ Achievement CRUD operations
+- ✅ Filter achievements by type
+
+### Planned Endpoints
+- Session invites management
+- Session image upload endpoints
+- Session tags management
+- Session locations management
+- User drink tracking
+- User favorite drinks
+- User and session achievements assignment
+- Payment tracking and splitting
+
+## Planned Features
 
 ### Additional Features
 - Payment tracking and splitting
