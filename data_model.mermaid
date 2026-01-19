@@ -157,8 +157,8 @@ erDiagram
     timestamptz createdAt "NOT NULL"
   }
   friendships {
-    guid userId PK FK "NOT NULL, references users.id"
-    guid friendId PK FK "NOT NULL, references users.id"
+    guid userId PK, FK "NOT NULL, references users.id"
+    guid friendId PK, FK "NOT NULL, references users.id"
     string status "pending|accepted|blocked, NOT NULL"
     timestamptz createdAt "NOT NULL"
     guid createdById FK "NOT NULL, references users.id"

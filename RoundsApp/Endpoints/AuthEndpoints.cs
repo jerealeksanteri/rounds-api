@@ -51,6 +51,7 @@ public static class AuthEndpoints
 
         return Results.Ok(new AuthResponse
         {
+            UserId = user.Id,
             Token = token,
             Email = user.Email ?? string.Empty,
             FirstName = user.FirstName ?? string.Empty,
@@ -80,6 +81,7 @@ public static class AuthEndpoints
 
         return Results.Ok(new AuthResponse
         {
+            UserId = user.Id,
             Token = token,
             Email = user.Email ?? string.Empty,
             FirstName = user.FirstName ?? string.Empty,
