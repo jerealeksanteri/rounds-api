@@ -73,7 +73,7 @@ public class AchievementEndpointsTests : IClassFixture<WebApplicationFactory<Pro
             Description = "Logged your first drink",
             Type = "milestone",
             Icon = "🍺",
-            Criteria = "drinks_count >= 1",
+            Criteria = "{\"drinks_count\": 1}",
         };
 
         // Act

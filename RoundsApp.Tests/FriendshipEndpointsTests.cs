@@ -154,7 +154,8 @@ public class FriendshipEndpointsTests : IClassFixture<WebApplicationFactory<Prog
     {
         // Arrange
         var token1 = await this.RegisterAndLoginAsync();
-        var user1Id = await this.GetCurrentUserIdAsync();
+        this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
+        var user1Id = this.GetCurrentUserIdFromToken();
 
         var (token2, user2Id) = await this.RegisterAndLoginWithIdAsync();
 
@@ -188,12 +189,10 @@ public class FriendshipEndpointsTests : IClassFixture<WebApplicationFactory<Prog
     {
         // Arrange
         var token1 = await this.RegisterAndLoginAsync();
-        var user1Id = await this.GetCurrentUserIdAsync();
+        this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
+        var user1Id = this.GetCurrentUserIdFromToken();
 
         var (_, user2Id) = await this.RegisterAndLoginWithIdAsync();
-
-        // User 1 sends friend request to User 2
-        this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
         var createRequest = new CreateFriendshipRequest
         {
             FriendId = user2Id,
@@ -221,12 +220,10 @@ public class FriendshipEndpointsTests : IClassFixture<WebApplicationFactory<Prog
     {
         // Arrange
         var token1 = await this.RegisterAndLoginAsync();
-        var user1Id = await this.GetCurrentUserIdAsync();
+        this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
+        var user1Id = this.GetCurrentUserIdFromToken();
 
         var (_, user2Id) = await this.RegisterAndLoginWithIdAsync();
-
-        // User 1 sends friend request to User 2
-        this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
         var createRequest = new CreateFriendshipRequest
         {
             FriendId = user2Id,
@@ -245,12 +242,10 @@ public class FriendshipEndpointsTests : IClassFixture<WebApplicationFactory<Prog
     {
         // Arrange
         var token1 = await this.RegisterAndLoginAsync();
-        var user1Id = await this.GetCurrentUserIdAsync();
+        this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
+        var user1Id = this.GetCurrentUserIdFromToken();
 
         var (_, user2Id) = await this.RegisterAndLoginWithIdAsync();
-
-        // User 1 sends friend request to User 2
-        this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
         var createRequest = new CreateFriendshipRequest
         {
             FriendId = user2Id,
@@ -372,11 +367,8 @@ public class FriendshipEndpointsTests : IClassFixture<WebApplicationFactory<Prog
         return authResponse!.UserId;
     }
 
-    private async Task<Guid> GetCurrentUserIdAsync()
+    private Guid GetCurrentUserIdFromToken()
     {
-        var response = await this.client.GetAsync("/api/sessions/");
-        response.EnsureSuccessStatusCode();
-
         var currentToken = this.client.DefaultRequestHeaders.Authorization?.Parameter;
         if (currentToken == null)
         {
