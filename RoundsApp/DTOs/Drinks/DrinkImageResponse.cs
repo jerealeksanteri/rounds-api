@@ -10,7 +10,7 @@ public class DrinkImageResponse
 
     public Guid DrinkId { get; set; }
 
-    public string ImageUrl { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
 
     public string? Caption { get; set; }
 

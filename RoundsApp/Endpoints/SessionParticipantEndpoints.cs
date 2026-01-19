@@ -5,6 +5,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using RoundsApp.DTOs.Sessions;
+using RoundsApp.DTOs.Users;
 using RoundsApp.Models;
 using RoundsApp.Repositories.IRepositories;
 
@@ -131,8 +132,23 @@ public static class SessionParticipantEndpoints
             Id = participant.Id,
             SessionId = participant.SessionId,
             UserId = participant.UserId,
+            User = participant.User != null ? MapUserToResponse(participant.User) : null,
             CreatedAt = participant.CreatedAt,
             CreatedById = participant.CreatedById,
+        };
+    }
+
+    private static UserResponse MapUserToResponse(ApplicationUser user)
+    {
+        return new UserResponse
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            CreatedAt = user.CreatedAt,
+            LastLoginAt = user.LastLoginAt,
         };
     }
 }

@@ -5,6 +5,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using RoundsApp.DTOs.Friendships;
+using RoundsApp.DTOs.Users;
 using RoundsApp.Models;
 using RoundsApp.Repositories.IRepositories;
 
@@ -199,10 +200,26 @@ public static class FriendshipEndpoints
         return new FriendshipResponse
         {
             UserId = friendship.UserId,
+            User = friendship.User != null ? MapUserToResponse(friendship.User) : null,
             FriendId = friendship.FriendId,
+            Friend = friendship.Friend != null ? MapUserToResponse(friendship.Friend) : null,
             Status = friendship.Status,
             CreatedAt = friendship.CreatedAt,
             CreatedById = friendship.CreatedById,
+        };
+    }
+
+    private static UserResponse MapUserToResponse(ApplicationUser user)
+    {
+        return new UserResponse
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            CreatedAt = user.CreatedAt,
+            LastLoginAt = user.LastLoginAt,
         };
     }
 }
