@@ -1,0 +1,34 @@
+is_global = true
+
+# SA1633: File should have header
+dotnet_diagnostic.SA1633.severity = none
+
+# SA1636: File header copyright text should match
+dotnet_diagnostic.SA1636.severity = none
+
+# SA1600: Elements should be documented
+dotnet_diagnostic.SA1600.severity = suggestion
+
+# SA1601: Partial elements should be documented
+dotnet_diagnostic.SA1601.severity = suggestion
+
+# SA1309: Field names should not begin with underscore (this is a common pattern for private fields)
+dotnet_diagnostic.SA1309.severity = none
+
+# SA1101: Prefix local calls with this
+dotnet_diagnostic.SA1101.severity = none
+
+# SA1009: Closing parenthesis should be followed by a space
+dotnet_diagnostic.SA1009.severity = none
+
+# SA1516: Elements should be separated by blank line
+dotnet_diagnostic.SA1516.severity = suggestion
+
+# SA0001: XML comment analysis disabled
+dotnet_diagnostic.SA0001.severity = none
+
+# S1118: Add a protected constructor or the static keyword (for Program class)
+dotnet_diagnostic.S1118.severity = suggestion
+
+# S6966: Prefer async methods (Await MigrateAsync/RunAsync)
+dotnet_diagnostic.S6966.severity = suggestion
