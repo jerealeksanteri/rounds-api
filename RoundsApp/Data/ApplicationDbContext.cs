@@ -16,39 +16,39 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     {
     }
 
-    public DbSet<DrinkingSession> DrinkingSessions { get; set; }
+    public DbSet<DrinkingSession> DrinkingSessions { get; set; } = null!;
 
-    public DbSet<SessionLocation> SessionLocations { get; set; }
+    public DbSet<SessionLocation> SessionLocations { get; set; } = null!;
 
-    public DbSet<SessionParticipant> SessionParticipants { get; set; }
+    public DbSet<SessionParticipant> SessionParticipants { get; set; } = null!;
 
-    public DbSet<SessionInvite> SessionInvites { get; set; }
+    public DbSet<SessionInvite> SessionInvites { get; set; } = null!;
 
-    public DbSet<SessionComment> SessionComments { get; set; }
+    public DbSet<SessionComment> SessionComments { get; set; } = null!;
 
-    public DbSet<SessionImage> SessionImages { get; set; }
+    public DbSet<SessionImage> SessionImages { get; set; } = null!;
 
-    public DbSet<SessionTag> SessionTags { get; set; }
+    public DbSet<SessionTag> SessionTags { get; set; } = null!;
 
-    public DbSet<DrinkType> DrinkTypes { get; set; }
+    public DbSet<DrinkType> DrinkTypes { get; set; } = null!;
 
-    public DbSet<Drink> Drinks { get; set; }
+    public DbSet<Drink> Drinks { get; set; } = null!;
 
-    public DbSet<DrinkImage> DrinkImages { get; set; }
+    public DbSet<DrinkImage> DrinkImages { get; set; } = null!;
 
-    public DbSet<UserDrink> UserDrinks { get; set; }
+    public DbSet<UserDrink> UserDrinks { get; set; } = null!;
 
-    public DbSet<UserFavouriteDrink> UserFavouriteDrinks { get; set; }
+    public DbSet<UserFavouriteDrink> UserFavouriteDrinks { get; set; } = null!;
 
-    public DbSet<Achievement> Achievements { get; set; }
+    public DbSet<Achievement> Achievements { get; set; } = null!;
 
-    public DbSet<UserAchievement> UserAchievements { get; set; }
+    public DbSet<UserAchievement> UserAchievements { get; set; } = null!;
 
-    public DbSet<SessionAchievement> SessionAchievements { get; set; }
+    public DbSet<SessionAchievement> SessionAchievements { get; set; } = null!;
 
-    public DbSet<Notification> Notifications { get; set; }
+    public DbSet<Notification> Notifications { get; set; } = null!;
 
-    public DbSet<Friendship> Friendships { get; set; }
+    public DbSet<Friendship> Friendships { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
