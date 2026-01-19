@@ -30,5 +30,5 @@ public class DrinkResponse
 
     public DateTime? UpdatedAt { get; set; }
 
-    public List<DrinkImageResponse> Images { get; set; } = new ();
+    public List<DrinkImageResponse> Images { get; set; } = new();
 }

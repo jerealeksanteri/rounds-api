@@ -234,7 +234,7 @@ public static class DrinkEndpoints
                 Url = i.Url,
                 Caption = i.Caption,
                 CreatedAt = i.CreatedAt,
-            }).ToList() ?? new (),
+            }).ToList() ?? new(),
         };
     }
 

@@ -30,17 +30,17 @@ public class SessionResponse
 
     public DateTime? UpdatedAt { get; set; }
 
-    public List<ParticipantResponse> Participants { get; set; } = new ();
+    public List<ParticipantResponse> Participants { get; set; } = new();
 
-    public List<SessionInviteResponse> Invites { get; set; } = new ();
+    public List<SessionInviteResponse> Invites { get; set; } = new();
 
-    public List<CommentResponse> Comments { get; set; } = new ();
+    public List<CommentResponse> Comments { get; set; } = new();
 
-    public List<SessionImageResponse> Images { get; set; } = new ();
+    public List<SessionImageResponse> Images { get; set; } = new();
 
-    public List<SessionTagResponse> Tags { get; set; } = new ();
+    public List<SessionTagResponse> Tags { get; set; } = new();
 
-    public List<SessionAchievementResponse> Achievements { get; set; } = new ();
+    public List<SessionAchievementResponse> Achievements { get; set; } = new();
 
-    public List<UserDrinkResponse> Drinks { get; set; } = new ();
+    public List<UserDrinkResponse> Drinks { get; set; } = new();
 }

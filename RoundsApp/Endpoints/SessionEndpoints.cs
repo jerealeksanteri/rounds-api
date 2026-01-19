@@ -235,7 +235,7 @@ public static class SessionEndpoints
                 User = p.User != null ? MapUserToResponse(p.User) : null,
                 CreatedAt = p.CreatedAt,
                 CreatedById = p.CreatedById,
-            }).ToList() ?? new (),
+            }).ToList() ?? new(),
             Invites = session.Invites?.Select(i => new SessionInviteResponse
             {
                 Id = i.Id,
@@ -244,7 +244,7 @@ public static class SessionEndpoints
                 User = i.User != null ? MapUserToResponse(i.User) : null,
                 Status = i.Status,
                 CreatedAt = i.CreatedAt,
-            }).ToList() ?? new (),
+            }).ToList() ?? new(),
             Comments = session.Comments?.Select(c => new CommentResponse
             {
                 Id = c.Id,
@@ -255,7 +255,7 @@ public static class SessionEndpoints
                 CreatedAt = c.CreatedAt,
                 CreatedById = c.CreatedById,
                 UpdatedAt = c.UpdatedAt,
-            }).ToList() ?? new (),
+            }).ToList() ?? new(),
             Images = session.Images?.Select(i => new SessionImageResponse
             {
                 Id = i.Id,
@@ -263,21 +263,21 @@ public static class SessionEndpoints
                 Url = i.Url,
                 Caption = i.Caption,
                 CreatedAt = i.CreatedAt,
-            }).ToList() ?? new (),
+            }).ToList() ?? new(),
             Tags = session.Tags?.Select(t => new SessionTagResponse
             {
                 Id = t.Id,
                 SessionId = t.SessionId,
                 Tag = t.Tag,
                 CreatedAt = t.CreatedAt,
-            }).ToList() ?? new (),
+            }).ToList() ?? new(),
             Achievements = session.Achievements?.Select(a => new SessionAchievementResponse
             {
                 Id = a.Id,
                 SessionId = a.SessionId,
                 AchievementId = a.AchievementId,
                 UnlockedAt = a.UnlockedAt,
-            }).ToList() ?? new (),
+            }).ToList() ?? new(),
             Drinks = session.Drinks?.Select(d => new UserDrinkResponse
             {
                 Id = d.Id,
@@ -287,7 +287,7 @@ public static class SessionEndpoints
                 SessionId = d.SessionId,
                 Quantity = d.Quantity,
                 CreatedAt = d.CreatedAt,
-            }).ToList() ?? new (),
+            }).ToList() ?? new(),
         };
     }
 
