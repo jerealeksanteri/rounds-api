@@ -73,6 +73,11 @@ public static class DrinkTypeEndpoints
             return Results.Unauthorized();
         }
 
+        if (string.IsNullOrWhiteSpace(request.Name))
+        {
+            return Results.BadRequest(new { message = "Name is required" });
+        }
+
         var drinkType = new DrinkType
         {
             Id = Guid.NewGuid(),

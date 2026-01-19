@@ -15,12 +15,15 @@ using RoundsApp.Repositories.IRepositories;
 using RoundsApp.Services;
 using Scalar.AspNetCore;
 using Serilog;
-
+using Serilog.Events;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
     .Enrich.FromLogContext()
     .WriteTo.Console()
     .WriteTo.File("logs/rounds-api-.txt", rollingInterval: RollingInterval.Day)
@@ -130,13 +133,17 @@ app.UseAuthorization();
 // Map Endpoints
 app.MapAuthEndpoints();
 app.MapSessionEndpoints();
+app.MapSessionParticipantEndpoints();
+app.MapSessionCommentEndpoints();
+app.MapSessionInviteEndpoints();
+app.MapSessionTagEndpoints();
+app.MapSessionImageEndpoints();
+app.MapSessionLocationEndpoints();
 app.MapDrinkEndpoints();
 app.MapDrinkTypeEndpoints();
 app.MapFriendshipEndpoints();
 app.MapAchievementEndpoints();
 app.MapNotificationEndpoints();
-app.MapSessionParticipantEndpoints();
-app.MapSessionCommentEndpoints();
 
 // Map Health Checks
 app.MapHealthChecks("/health");

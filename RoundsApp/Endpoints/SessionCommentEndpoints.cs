@@ -5,6 +5,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using RoundsApp.DTOs.Sessions;
+using RoundsApp.DTOs.Users;
 using RoundsApp.Models;
 using RoundsApp.Repositories.IRepositories;
 
@@ -159,10 +160,25 @@ public static class SessionCommentEndpoints
             Id = comment.Id,
             SessionId = comment.SessionId,
             UserId = comment.UserId,
+            User = comment.User != null ? MapUserToResponse(comment.User) : null,
             Content = comment.Content,
             CreatedAt = comment.CreatedAt,
             CreatedById = comment.CreatedById,
             UpdatedAt = comment.UpdatedAt,
+        };
+    }
+
+    private static UserResponse MapUserToResponse(ApplicationUser user)
+    {
+        return new UserResponse
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            CreatedAt = user.CreatedAt,
+            LastLoginAt = user.LastLoginAt,
         };
     }
 }

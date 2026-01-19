@@ -1,4 +1,4 @@
-// <copyright file="ParticipantResponse.cs" company="RoundsApp">
+// <copyright file="SessionInviteResponse.cs" company="RoundsApp">
 // Copyright (c) RoundsApp. All rights reserved.
 // </copyright>
 
@@ -6,7 +6,7 @@ using RoundsApp.DTOs.Users;
 
 namespace RoundsApp.DTOs.Sessions;
 
-public class ParticipantResponse
+public class SessionInviteResponse
 {
     public Guid Id { get; set; }
 
@@ -16,7 +16,7 @@ public class ParticipantResponse
 
     public UserResponse? User { get; set; }
 
-    public DateTime CreatedAt { get; set; }
+    public string Status { get; set; } = string.Empty;
 
-    public Guid CreatedById { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
