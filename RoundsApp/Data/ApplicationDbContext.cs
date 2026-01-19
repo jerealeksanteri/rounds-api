@@ -16,12 +16,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     {
     }
 
-    public DbSet<DrinkingSession> DrinkingSessions { get; set; }
-    public DbSet<DrinkingSessionParticipation> DrinkingSessionParticipations { get; set; }
-    public DbSet<DrinkingSessionImage> DrinkingSessionImages { get; set; }
-    public DbSet<DrinkingSessionParticipationDrink> DrinkingSessionParticipationDrinks { get; set; }
-    public DbSet<Drink> Drinks { get; set; }
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -30,26 +24,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         builder.Entity<ApplicationUser>(entity =>
         {
             entity.ToTable(name: "Users");
-        });
-
-        builder.Entity<DrinkingSession>(entity =>
-        {
-            entity.ToTable(name: "DrinkingSessions");
-        });
-
-        builder.Entity<DrinkingSessionParticipation>(entity =>
-        {
-            entity.ToTable(name: "DrinkingSessionParticipations");
-        });
-
-        builder.Entity<DrinkingSessionImage>(entity =>
-        {
-            entity.ToTable(name: "DrinkingSessionImages");
-        });
-
-        builder.Entity<DrinkingSessionParticipationDrink>(entity =>
-        {
-            entity.ToTable(name: "DrinkingSessionParticipationDrinks");
         });
     }
 }

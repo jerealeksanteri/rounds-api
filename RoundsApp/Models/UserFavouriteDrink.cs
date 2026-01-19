@@ -1,4 +1,4 @@
-// <copyright file="DrinkType.cs" company="RoundsApp">
+// <copyright file="UserFavouriteDrink.cs" company="RoundsApp">
 // Copyright (c) RoundsApp. All rights reserved.
 // </copyright>
 
@@ -7,15 +7,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RoundsApp.Models;
 
-public class DrinkType
+public class UserFavouriteDrink
 {
     [Key]
     public Guid Id { get; set; }
 
     [Required]
-    public string Name { get; set; } = string.Empty;
+    public Guid UserId { get; set; }
 
-    public string? Description { get; set; }
+    [ForeignKey(nameof(UserId))]
+    public ApplicationUser? User { get; set; }
+
+    [Required]
+    public Guid DrinkId { get; set; }
+
+    [ForeignKey(nameof(DrinkId))]
+    public Drink? Drink { get; set; }
 
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -25,13 +32,4 @@ public class DrinkType
 
     [ForeignKey(nameof(CreatedById))]
     public ApplicationUser? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedById { get; set; }
-
-    [ForeignKey(nameof(UpdatedById))]
-    public ApplicationUser? UpdatedBy { get; set; }
-
-    public ICollection<Drink> Drinks { get; set; } = new List<Drink>();
 }

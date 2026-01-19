@@ -1,4 +1,4 @@
-// <copyright file="Drink.cs" company="RoundsApp">
+// <copyright file="UserDrink.cs" company="RoundsApp">
 // Copyright (c) RoundsApp. All rights reserved.
 // </copyright>
 
@@ -7,27 +7,31 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RoundsApp.Models;
 
-public class Drink
+public class UserDrink
 {
     [Key]
     public Guid Id { get; set; }
 
     [Required]
-    public string Name { get; set; } = string.Empty;
+    public Guid UserId { get; set; }
 
-    public string? Description { get; set; }
-
-    [Required]
-    public Guid DrinkTypeId { get; set; }
-
-    [ForeignKey(nameof(DrinkTypeId))]
-    public DrinkType? DrinkType { get; set; }
+    [ForeignKey(nameof(UserId))]
+    public ApplicationUser? User { get; set; }
 
     [Required]
-    public decimal AlcoholContent { get; set; }
+    public Guid SessionId { get; set; }
+
+    [ForeignKey(nameof(SessionId))]
+    public DrinkingSession? Session { get; set; }
 
     [Required]
-    public decimal VolumeLitres { get; set; }
+    public Guid DrinkId { get; set; }
+
+    [ForeignKey(nameof(DrinkId))]
+    public Drink? Drink { get; set; }
+
+    [Required]
+    public int Quantity { get; set; }
 
     [Required]
     public Guid CreatedById { get; set; }
@@ -44,10 +48,4 @@ public class Drink
     public ApplicationUser? UpdatedBy { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
-
-    public ICollection<DrinkImage> Images { get; set; } = new List<DrinkImage>();
-
-    public ICollection<UserDrink> UserDrinks { get; set; } = new List<UserDrink>();
-
-    public ICollection<UserFavouriteDrink> FavouritedBy { get; set; } = new List<UserFavouriteDrink>();
 }

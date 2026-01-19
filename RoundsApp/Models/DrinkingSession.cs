@@ -4,41 +4,55 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 namespace RoundsApp.Models;
 
-/// <summary>
-/// Represents a drinking session.
-/// </summary>
 public class DrinkingSession
 {
     [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; }
 
     [Required]
-    [MaxLength(200)]
-    public string? Title { get; set; }
+    public string Name { get; set; } = string.Empty;
 
-    [MaxLength(1000)]
     public string? Description { get; set; }
 
-    public DateTime? ScheduledAt { get; set; }
+    public DateTime? StartsAt { get; set; }
 
-    public List<DrinkingSessionParticipation> Participants { get; set; } = new List<DrinkingSessionParticipation>();
-    public List<DrinkingSessionImage> Images { get; set; } = new List<DrinkingSessionImage>();
+    public DateTime? EndsAt { get; set; }
+
+    public Guid? LocationId { get; set; }
+
+    [ForeignKey(nameof(LocationId))]
+    public SessionLocation? Location { get; set; }
 
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [Required]
-    [ForeignKey("CreatedBy")]
     public Guid CreatedById { get; set; }
 
+    [ForeignKey(nameof(CreatedById))]
     public ApplicationUser? CreatedBy { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
 
-    [ForeignKey("UpdatedBy")]
     public Guid? UpdatedById { get; set; }
 
+    [ForeignKey(nameof(UpdatedById))]
     public ApplicationUser? UpdatedBy { get; set; }
+
+    public ICollection<SessionParticipant> Participants { get; set; } = new List<SessionParticipant>();
+
+    public ICollection<SessionInvite> Invites { get; set; } = new List<SessionInvite>();
+
+    public ICollection<SessionComment> Comments { get; set; } = new List<SessionComment>();
+
+    public ICollection<SessionImage> Images { get; set; } = new List<SessionImage>();
+
+    public ICollection<SessionTag> Tags { get; set; } = new List<SessionTag>();
+
+    public ICollection<SessionAchievement> Achievements { get; set; } = new List<SessionAchievement>();
+
+    public ICollection<UserDrink> Drinks { get; set; } = new List<UserDrink>();
 }

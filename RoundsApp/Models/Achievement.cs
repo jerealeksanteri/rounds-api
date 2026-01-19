@@ -1,4 +1,4 @@
-// <copyright file="DrinkType.cs" company="RoundsApp">
+// <copyright file="Achievement.cs" company="RoundsApp">
 // Copyright (c) RoundsApp. All rights reserved.
 // </copyright>
 
@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RoundsApp.Models;
 
-public class DrinkType
+public class Achievement
 {
     [Key]
     public Guid Id { get; set; }
@@ -15,7 +15,17 @@ public class DrinkType
     [Required]
     public string Name { get; set; } = string.Empty;
 
-    public string? Description { get; set; }
+    [Required]
+    public string Description { get; set; } = string.Empty;
+
+    [Required]
+    public string Type { get; set; } = string.Empty;
+
+    public string? Icon { get; set; }
+
+    [Required]
+    [Column(TypeName = "jsonb")]
+    public string Criteria { get; set; } = "{}";
 
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -33,5 +43,7 @@ public class DrinkType
     [ForeignKey(nameof(UpdatedById))]
     public ApplicationUser? UpdatedBy { get; set; }
 
-    public ICollection<Drink> Drinks { get; set; } = new List<Drink>();
+    public ICollection<UserAchievement> UserAchievements { get; set; } = new List<UserAchievement>();
+
+    public ICollection<SessionAchievement> SessionAchievements { get; set; } = new List<SessionAchievement>();
 }

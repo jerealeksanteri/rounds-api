@@ -1,4 +1,4 @@
-// <copyright file="DrinkType.cs" company="RoundsApp">
+// <copyright file="SessionLocation.cs" company="RoundsApp">
 // Copyright (c) RoundsApp. All rights reserved.
 // </copyright>
 
@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RoundsApp.Models;
 
-public class DrinkType
+public class SessionLocation
 {
     [Key]
     public Guid Id { get; set; }
@@ -15,7 +15,11 @@ public class DrinkType
     [Required]
     public string Name { get; set; } = string.Empty;
 
-    public string? Description { get; set; }
+    public string? Address { get; set; }
+
+    public decimal? Latitude { get; set; }
+
+    public decimal? Longitude { get; set; }
 
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -33,5 +37,5 @@ public class DrinkType
     [ForeignKey(nameof(UpdatedById))]
     public ApplicationUser? UpdatedBy { get; set; }
 
-    public ICollection<Drink> Drinks { get; set; } = new List<Drink>();
+    public ICollection<DrinkingSession> Sessions { get; set; } = new List<DrinkingSession>();
 }

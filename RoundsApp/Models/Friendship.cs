@@ -1,21 +1,30 @@
-// <copyright file="DrinkType.cs" company="RoundsApp">
+// <copyright file="Friendship.cs" company="RoundsApp">
 // Copyright (c) RoundsApp. All rights reserved.
 // </copyright>
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace RoundsApp.Models;
 
-public class DrinkType
+[PrimaryKey(nameof(UserId), nameof(FriendId))]
+public class Friendship
 {
-    [Key]
-    public Guid Id { get; set; }
+    [Required]
+    public Guid UserId { get; set; }
+
+    [ForeignKey(nameof(UserId))]
+    public ApplicationUser? User { get; set; }
 
     [Required]
-    public string Name { get; set; } = string.Empty;
+    public Guid FriendId { get; set; }
 
-    public string? Description { get; set; }
+    [ForeignKey(nameof(FriendId))]
+    public ApplicationUser? Friend { get; set; }
+
+    [Required]
+    public string Status { get; set; } = "pending";
 
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -32,6 +41,4 @@ public class DrinkType
 
     [ForeignKey(nameof(UpdatedById))]
     public ApplicationUser? UpdatedBy { get; set; }
-
-    public ICollection<Drink> Drinks { get; set; } = new List<Drink>();
 }

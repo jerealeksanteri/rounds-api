@@ -1,39 +1,45 @@
-// <copyright file="DrinkingSessionImage.cs" company="RoundsApp">
+// <copyright file="SessionComment.cs" company="RoundsApp">
 // Copyright (c) RoundsApp. All rights reserved.
 // </copyright>
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 namespace RoundsApp.Models;
 
-/// <summary>
-/// Represents an image associated with a drinking session.
-/// </summary>
-public class DrinkingSessionImage
+public class SessionComment
 {
     [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; }
 
     [Required]
-    [ForeignKey("DrinkingSession")]
-    public Guid DrinkingSessionId { get; set; }
-    public DrinkingSession? DrinkingSession { get; set; }
+    public Guid SessionId { get; set; }
+
+    [ForeignKey(nameof(SessionId))]
+    public DrinkingSession? Session { get; set; }
 
     [Required]
-    public byte[] ? ImageData { get; set; }
+    public Guid UserId { get; set; }
+
+    [ForeignKey(nameof(UserId))]
+    public ApplicationUser? User { get; set; }
+
+    [Required]
+    public string Content { get; set; } = string.Empty;
 
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [Required]
-    [ForeignKey("CreatedBy")]
     public Guid CreatedById { get; set; }
 
+    [ForeignKey(nameof(CreatedById))]
     public ApplicationUser? CreatedBy { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
 
-    [ForeignKey("UpdatedBy")]
     public Guid? UpdatedById { get; set; }
 
+    [ForeignKey(nameof(UpdatedById))]
     public ApplicationUser? UpdatedBy { get; set; }
 }
