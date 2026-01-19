@@ -5,6 +5,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using RoundsApp.DTOs.Sessions;
+using RoundsApp.DTOs.Users;
 using RoundsApp.Models;
 using RoundsApp.Repositories.IRepositories;
 
@@ -212,9 +213,95 @@ public static class SessionEndpoints
             StartsAt = session.StartsAt,
             EndsAt = session.EndsAt,
             LocationId = session.LocationId,
+            Location = session.Location != null ? new SessionLocationResponse
+            {
+                Id = session.Location.Id,
+                Name = session.Location.Name,
+                Address = session.Location.Address,
+                Latitude = session.Location.Latitude,
+                Longitude = session.Location.Longitude,
+                CreatedAt = session.Location.CreatedAt,
+            }
+            : null,
             CreatedById = session.CreatedById,
+            CreatedBy = session.CreatedBy != null ? MapUserToResponse(session.CreatedBy) : null,
             CreatedAt = session.CreatedAt,
             UpdatedAt = session.UpdatedAt,
+            Participants = session.Participants?.Select(p => new ParticipantResponse
+            {
+                Id = p.Id,
+                SessionId = p.SessionId,
+                UserId = p.UserId,
+                User = p.User != null ? MapUserToResponse(p.User) : null,
+                CreatedAt = p.CreatedAt,
+                CreatedById = p.CreatedById,
+            }).ToList() ?? new (),
+            Invites = session.Invites?.Select(i => new SessionInviteResponse
+            {
+                Id = i.Id,
+                SessionId = i.SessionId,
+                UserId = i.UserId,
+                User = i.User != null ? MapUserToResponse(i.User) : null,
+                Status = i.Status,
+                CreatedAt = i.CreatedAt,
+            }).ToList() ?? new (),
+            Comments = session.Comments?.Select(c => new CommentResponse
+            {
+                Id = c.Id,
+                SessionId = c.SessionId,
+                UserId = c.UserId,
+                User = c.User != null ? MapUserToResponse(c.User) : null,
+                Content = c.Content,
+                CreatedAt = c.CreatedAt,
+                CreatedById = c.CreatedById,
+                UpdatedAt = c.UpdatedAt,
+            }).ToList() ?? new (),
+            Images = session.Images?.Select(i => new SessionImageResponse
+            {
+                Id = i.Id,
+                SessionId = i.SessionId,
+                Url = i.Url,
+                Caption = i.Caption,
+                CreatedAt = i.CreatedAt,
+            }).ToList() ?? new (),
+            Tags = session.Tags?.Select(t => new SessionTagResponse
+            {
+                Id = t.Id,
+                SessionId = t.SessionId,
+                Tag = t.Tag,
+                CreatedAt = t.CreatedAt,
+            }).ToList() ?? new (),
+            Achievements = session.Achievements?.Select(a => new SessionAchievementResponse
+            {
+                Id = a.Id,
+                SessionId = a.SessionId,
+                AchievementId = a.AchievementId,
+                UnlockedAt = a.UnlockedAt,
+            }).ToList() ?? new (),
+            Drinks = session.Drinks?.Select(d => new UserDrinkResponse
+            {
+                Id = d.Id,
+                UserId = d.UserId,
+                User = d.User != null ? MapUserToResponse(d.User) : null,
+                DrinkId = d.DrinkId,
+                SessionId = d.SessionId,
+                Quantity = d.Quantity,
+                CreatedAt = d.CreatedAt,
+            }).ToList() ?? new (),
+        };
+    }
+
+    private static UserResponse MapUserToResponse(ApplicationUser user)
+    {
+        return new UserResponse
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            CreatedAt = user.CreatedAt,
+            LastLoginAt = user.LastLoginAt,
         };
     }
 }
