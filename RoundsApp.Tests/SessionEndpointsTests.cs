@@ -17,7 +17,6 @@ namespace RoundsApp.Tests;
 public class SessionEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly HttpClient client;
-    private readonly WebApplicationFactory<Program> factory;
 
     public SessionEndpointsTests(WebApplicationFactory<Program> factory)
     {
@@ -32,7 +31,6 @@ public class SessionEndpointsTests : IClassFixture<WebApplicationFactory<Program
             builder.UseEnvironment("Test");
         });
 
-        this.factory = customFactory;
         this.client = customFactory.CreateClient();
     }
 

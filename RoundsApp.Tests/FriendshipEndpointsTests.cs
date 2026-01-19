@@ -17,7 +17,6 @@ namespace RoundsApp.Tests;
 public class FriendshipEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly HttpClient client;
-    private readonly WebApplicationFactory<Program> factory;
 
     public FriendshipEndpointsTests(WebApplicationFactory<Program> factory)
     {
@@ -32,7 +31,6 @@ public class FriendshipEndpointsTests : IClassFixture<WebApplicationFactory<Prog
             builder.UseEnvironment("Test");
         });
 
-        this.factory = customFactory;
         this.client = customFactory.CreateClient();
     }
 
@@ -192,7 +190,7 @@ public class FriendshipEndpointsTests : IClassFixture<WebApplicationFactory<Prog
         var token1 = await this.RegisterAndLoginAsync();
         var user1Id = await this.GetCurrentUserIdAsync();
 
-        var (token2, user2Id) = await this.RegisterAndLoginWithIdAsync();
+        var (_, user2Id) = await this.RegisterAndLoginWithIdAsync();
 
         // User 1 sends friend request to User 2
         this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
@@ -225,7 +223,7 @@ public class FriendshipEndpointsTests : IClassFixture<WebApplicationFactory<Prog
         var token1 = await this.RegisterAndLoginAsync();
         var user1Id = await this.GetCurrentUserIdAsync();
 
-        var (token2, user2Id) = await this.RegisterAndLoginWithIdAsync();
+        var (_, user2Id) = await this.RegisterAndLoginWithIdAsync();
 
         // User 1 sends friend request to User 2
         this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
@@ -249,7 +247,7 @@ public class FriendshipEndpointsTests : IClassFixture<WebApplicationFactory<Prog
         var token1 = await this.RegisterAndLoginAsync();
         var user1Id = await this.GetCurrentUserIdAsync();
 
-        var (token2, user2Id) = await this.RegisterAndLoginWithIdAsync();
+        var (_, user2Id) = await this.RegisterAndLoginWithIdAsync();
 
         // User 1 sends friend request to User 2
         this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
@@ -378,12 +376,6 @@ public class FriendshipEndpointsTests : IClassFixture<WebApplicationFactory<Prog
     {
         var response = await this.client.GetAsync("/api/sessions/");
         response.EnsureSuccessStatusCode();
-
-        var loginRequest = new LoginRequest
-        {
-            Email = string.Empty,
-            Password = string.Empty,
-        };
 
         var currentToken = this.client.DefaultRequestHeaders.Authorization?.Parameter;
         if (currentToken == null)

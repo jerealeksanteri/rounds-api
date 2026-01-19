@@ -84,8 +84,8 @@ public class SessionLocationEndpointsTests : IClassFixture<WebApplicationFactory
         result.Should().NotBeNull();
         result!.Name.Should().Be("Test Bar");
         result.Address.Should().Be("123 Test Street");
-        result.Latitude.Should().Be(60.1699);
-        result.Longitude.Should().Be(24.9384);
+        result.Latitude.Should().Be(60.1699m);
+        result.Longitude.Should().Be(24.9384m);
     }
 
     [Fact]
