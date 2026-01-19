@@ -1,0 +1,192 @@
+erDiagram
+  users {
+    guid id PK
+  }
+  drinkingSessions {
+    guid id PK
+    string name "NOT NULL"
+    string description
+    timestamptz startsAt
+    timestamptz endsAt
+    guid locationId FK "references sessionLocations.id"
+    timestamptz createdAt "NOT NULL"
+    guid createdById FK "NOT NULL, references users.id"
+    timestamptz updatedAt
+    guid updatedById FK "references users.id"
+  }
+  sessionParticipants {
+    guid id PK
+    guid sessionId FK "NOT NULL, references drinkingSessions.id"
+    guid userId FK "NOT NULL, references users.id"
+    timestamptz createdAt "NOT NULL"
+    guid createdById FK "NOT NULL, references users.id"
+    timestamptz updatedAt
+    guid updatedById FK "references users.id"
+  }
+  sessionInvites {
+    guid id PK
+    guid sessionId FK "NOT NULL, references drinkingSessions.id"
+    guid userId FK "NOT NULL, references users.id"
+    string status "pending|accepted|declined, NOT NULL"
+    timestamptz createdAt "NOT NULL"
+    guid createdById FK "NOT NULL, references users.id"
+    timestamptz updatedAt
+    guid updatedById FK "references users.id"
+  }
+  sessionComments {
+    guid id PK
+    guid sessionId FK "NOT NULL, references drinkingSessions.id"
+    guid userId FK "NOT NULL, references users.id"
+    text content "NOT NULL"
+    timestamptz createdAt "NOT NULL"
+    guid createdById FK "NOT NULL, references users.id"
+    timestamptz updatedAt
+    guid updatedById FK "references users.id"
+  }
+  sessionImages {
+    guid id PK
+    guid sessionId FK "NOT NULL, references drinkingSessions.id"
+    string url "NOT NULL"
+    string caption
+    timestamptz createdAt "NOT NULL"
+    guid createdById FK "NOT NULL, references users.id"
+    timestamptz updatedAt
+    guid updatedById FK "references users.id"
+  }
+  sessionLocations {
+    guid id PK
+    string name "NOT NULL"
+    string address
+    numeral latitude
+    numeral longitude
+    timestamptz createdAt "NOT NULL"
+    guid createdById FK "NOT NULL, references users.id"
+    timestamptz updatedAt
+    guid updatedById FK "references users.id"
+  }
+  sessionTags {
+    guid id PK
+    guid sessionId FK "NOT NULL, references drinkingSessions.id"
+    string tag "NOT NULL"
+    timestamptz createdAt "NOT NULL"
+    guid createdById FK "NOT NULL, references users.id"
+  }
+  userDrinks {
+    guid id PK
+    guid userId FK "NOT NULL, references users.id"
+    guid sessionId FK "NOT NULL, references drinkingSessions.id"
+    guid drinkId FK "NOT NULL, references drinks.id"
+    int quantity "NOT NULL"
+    guid createdById FK "NOT NULL, references users.id"
+    timestamptz createdAt "NOT NULL"
+    guid updatedById FK "references users.id"
+    timestamptz updatedAt
+  }
+  drinkTypes {
+    guid id PK
+    string name "NOT NULL, spirit|beer|wine|longDrink|cocktail|cider|etc"
+    string description
+    timestamptz createdAt "NOT NULL"
+    guid createdById FK "NOT NULL, references users.id"
+    timestamptz updatedAt
+    guid updatedById FK "references users.id"
+  }
+  drinks {
+    guid id PK
+    string name "NOT NULL"
+    string description
+    guid drinkTypeId FK "NOT NULL, references drinkTypes.id"
+    numeral alcoholContent "NOT NULL"
+    numeral volumeLitres "NOT NULL"
+    guid createdById FK "NOT NULL, references users.id"
+    timestamptz createdAt "NOT NULL"
+    guid updatedById FK "references users.id"
+    timestamptz updatedAt
+  }
+  drinkImages {
+    guid id PK
+    guid drinkId FK "NOT NULL, references drinks.id"
+    string url "NOT NULL"
+    string caption
+    timestamptz createdAt "NOT NULL"
+    guid createdById FK "NOT NULL, references users.id"
+    timestamptz updatedAt
+    guid updatedById FK "references users.id"
+  }
+  userFavouriteDrinks {
+    guid id PK
+    guid userId FK "NOT NULL, references users.id"
+    guid drinkId FK "NOT NULL, references drinks.id"
+    timestamptz createdAt "NOT NULL"
+    guid createdById FK "NOT NULL, references users.id"
+  }
+  achievements {
+    guid id PK
+    string name "NOT NULL"
+    string description "NOT NULL"
+    string type "user|session, NOT NULL"
+    string icon
+    json criteria "NOT NULL"
+    timestamptz createdAt "NOT NULL"
+    guid createdById FK "NOT NULL, references users.id"
+    timestamptz updatedAt
+    guid updatedById FK "references users.id"
+  }
+  userAchievements {
+    guid id PK
+    guid userId FK "NOT NULL, references users.id"
+    guid achievementId FK "NOT NULL, references achievements.id"
+    timestamptz unlockedAt "NOT NULL"
+    timestamptz createdAt "NOT NULL"
+  }
+  sessionAchievements {
+    guid id PK
+    guid sessionId FK "NOT NULL, references drinkingSessions.id"
+    guid achievementId FK "NOT NULL, references achievements.id"
+    timestamptz unlockedAt "NOT NULL"
+    timestamptz createdAt "NOT NULL"
+  }
+  notifications {
+    guid id PK
+    guid userId FK "NOT NULL, references users.id"
+    string type "friendRequest|sessionInvite|comment|achievement|mention, NOT NULL"
+    string title "NOT NULL"
+    string message "NOT NULL"
+    json metadata "links, IDs, etc"
+    boolean read "NOT NULL, default false"
+    timestamptz createdAt "NOT NULL"
+  }
+  friendships {
+    guid userId PK FK "NOT NULL, references users.id"
+    guid friendId PK FK "NOT NULL, references users.id"
+    string status "pending|accepted|blocked, NOT NULL"
+    timestamptz createdAt "NOT NULL"
+    guid createdById FK "NOT NULL, references users.id"
+    timestamptz updatedAt
+    guid updatedById FK "references users.id"
+  }
+
+  users ||--o{ drinkingSessions : creates
+  users ||--o{ sessionParticipants : joins
+  users ||--o{ sessionInvites : invited_to
+  users ||--o{ sessionComments : writes
+  users ||--o{ userDrinks : consumes
+  users ||--o{ userFavouriteDrinks : favorites
+  users ||--o{ userAchievements : unlocked
+  users ||--o{ notifications : receives
+  users ||--o{ friendships : has_friends
+  users ||--o{ friendships : friended_by
+  drinkingSessions ||--o{ sessionParticipants : has
+  drinkingSessions ||--o{ sessionInvites : has
+  drinkingSessions ||--o{ sessionComments : has
+  drinkingSessions ||--o{ sessionImages : has
+  drinkingSessions ||--o{ sessionTags : has
+  drinkingSessions ||--o{ sessionAchievements : unlocked
+  drinkingSessions ||--o{ userDrinks : includes
+  sessionLocations ||--o{ drinkingSessions : hosts
+  drinkTypes ||--o{ drinks : categorizes
+  drinks ||--o{ drinkImages : has
+  drinks ||--o{ userDrinks : consumed_in
+  drinks ||--o{ userFavouriteDrinks : favorited_by
+  achievements ||--o{ userAchievements : unlocked_by_users
+  achievements ||--o{ sessionAchievements : unlocked_by_sessions
