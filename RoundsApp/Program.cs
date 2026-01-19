@@ -130,13 +130,17 @@ app.UseAuthorization();
 // Map Endpoints
 app.MapAuthEndpoints();
 app.MapSessionEndpoints();
+app.MapSessionParticipantEndpoints();
+app.MapSessionCommentEndpoints();
+app.MapSessionInviteEndpoints();
+app.MapSessionTagEndpoints();
+app.MapSessionImageEndpoints();
+app.MapSessionLocationEndpoints();
 app.MapDrinkEndpoints();
 app.MapDrinkTypeEndpoints();
 app.MapFriendshipEndpoints();
 app.MapAchievementEndpoints();
 app.MapNotificationEndpoints();
-app.MapSessionParticipantEndpoints();
-app.MapSessionCommentEndpoints();
 
 // Map Health Checks
 app.MapHealthChecks("/health");
