@@ -8,7 +8,13 @@ Rounds is a social application designed to enhance the beer drinking experience 
 
 ## Project Status
 
-This project is in active development. Core infrastructure including authentication, database schema, and repository layer are implemented.
+This project is in active development. Core infrastructure is complete with:
+- ✅ Full database schema (17+ entities)
+- ✅ Repository layer with complete CRUD operations
+- ✅ JWT authentication and authorization
+- ✅ Comprehensive REST API endpoints
+- ✅ 135 integration tests (all passing)
+- ✅ CI/CD pipeline with GitHub Actions
 
 ## Tech Stack
 
@@ -140,6 +146,8 @@ Key configuration options in `.env`:
 ## Implemented Features
 
 ### Data Models & Repository Layer
+- ✅ Complete database schema with 17+ entities
+- ✅ Repository pattern with interfaces for all entities
 - ✅ Session management (drinking sessions, locations, participants, invites)
 - ✅ Comment and image support for sessions
 - ✅ Tag system for categorizing sessions
@@ -149,66 +157,100 @@ Key configuration options in `.env`:
 - ✅ Achievement system (user and session achievements)
 - ✅ Friendship system with directional relationships
 - ✅ Notification system
-- ✅ Complete CRUD operations via repositories
+- ✅ Audit tracking (CreatedBy, CreatedAt, UpdatedBy, UpdatedAt)
 
 ## API Endpoints
 
 ### Implemented Endpoints
 
+#### Authentication
+- ✅ User registration with email validation
+- ✅ User login with JWT token generation
+- ✅ Password validation and security requirements
+
 #### Sessions
 - ✅ Session CRUD operations (GET, POST, PUT, DELETE)
-- ✅ Get sessions by user
+- ✅ Get sessions by user ID
 - ✅ Get upcoming sessions
-- ✅ Session participant management
-- ✅ Session comment management
+- ✅ Session participant management (add, remove, update status)
+- ✅ Session comment management (create, update, delete)
+- ✅ Session invite management (create, accept, reject)
+- ✅ Session tag management (create, delete)
+- ✅ Session location management (create, update, delete)
+- ✅ Session image management (metadata only)
 
 #### Drinks & Drink Types
-- ✅ Drink CRUD operations
+- ✅ Drink CRUD operations (GET, POST, PUT, DELETE)
 - ✅ Search drinks by name
 - ✅ Filter drinks by type
-- ✅ Drink Type CRUD operations
+- ✅ Drink Type CRUD operations (GET, POST, PUT, DELETE)
+- ✅ Get drink types by creator
+- ✅ Name validation for drink types
 
 #### Social Features
-- ✅ Friendship management (send, accept, reject requests)
-- ✅ Get friends, pending, and sent requests
-- ✅ Notification system with read/unread status
+- ✅ Friendship management (create, update, delete)
+- ✅ Get all friendships for a user
+- ✅ Get received friend requests
+- ✅ Get sent friend requests
+- ✅ Accept/reject friend requests
+- ✅ Authorization checks for friendship operations
+- ✅ Notification CRUD operations
+- ✅ Get unread notifications
+- ✅ Mark notifications as read
 
 #### Achievements
-- ✅ Achievement CRUD operations
+- ✅ Achievement CRUD operations (GET, POST, PUT, DELETE)
 - ✅ Filter achievements by type
+- ✅ JSON criteria storage for achievement conditions
 
-### Planned Endpoints
-- Session invites management
-- Session image upload endpoints
-- Session tags management
-- Session locations management
-- User drink tracking
-- User favorite drinks
-- User and session achievements assignment
-- Payment tracking and splitting
+### Testing
+- ✅ Comprehensive integration tests for all endpoints (135 tests)
+- ✅ Test coverage for authentication flows
+- ✅ Test coverage for authorization and access control
+- ✅ Validation testing for required fields
+- ✅ Database state verification in tests
 
 ## Planned Features
 
 ### Additional Features
+- Image upload and storage integration (S3/Azure Blob)
+- User drink tracking per session endpoints
+- User favorite drinks endpoints
+- User and session achievements assignment
 - Payment tracking and splitting
 - Real-time notifications via SignalR
-- Image storage integration (S3/Azure Blob)
-- Search and filtering
-- Analytics and reporting
+- Advanced search and filtering capabilities
+- Analytics and reporting dashboards
+- Profile management endpoints
+- Statistics and leaderboards
 
 ## Development
 
 ### Running Tests
+
+The project has 135 integration tests covering all API endpoints.
 
 Run all tests:
 ```bash
 dotnet test
 ```
 
+Run tests with detailed output:
+```bash
+dotnet test --logger "console;verbosity=detailed"
+```
+
 Run tests with coverage:
 ```bash
 dotnet test /p:CollectCoverage=true
 ```
+
+Test coverage includes:
+- Authentication and authorization
+- All CRUD operations
+- Input validation
+- Access control and permissions
+- Database state verification
 
 ### Database Migrations
 

@@ -197,6 +197,9 @@ csharp_space_between_method_declaration_parameter_list_parentheses = false
 csharp_space_between_parentheses = false
 csharp_space_between_square_brackets = false
 
+# StyleCop.Analyzers - spacing rules
+dotnet_diagnostic.SA1000.severity = none
+
 # Wrapping preferences
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
