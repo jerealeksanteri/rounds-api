@@ -8,7 +8,7 @@ Rounds is a social application designed to enhance the beer drinking experience 
 
 ## Project Status
 
-This project is in active development. Authentication, database integration, and core API infrastructure are implemented.
+This project is in active development. Core infrastructure including authentication, database schema, and repository layer are implemented.
 
 ## Tech Stack
 
@@ -25,9 +25,19 @@ This project is in active development. Authentication, database integration, and
 
 ## Features
 
+### Authentication & User Management
 - JWT-based authentication
 - User management with ASP.NET Core Identity
+- Token-based authorization
+
+### Database & Data Layer
 - PostgreSQL database with Entity Framework Core
+- Complete domain model with 17+ entities
+- Repository pattern implementation with interfaces
+- Audit fields tracking (CreatedBy, CreatedAt, UpdatedBy, UpdatedAt)
+- Composite keys and complex relationships
+
+### Infrastructure
 - OpenAPI/Swagger documentation with Scalar UI
 - Dockerized application and database
 - Environment-based configuration
@@ -36,6 +46,13 @@ This project is in active development. Authentication, database integration, and
 - Comprehensive test suite with xUnit
 - GitHub Actions CI/CD pipeline
 - Code formatting standards with .editorconfig
+
+### Domain Models
+- **Sessions**: Drinking sessions with locations, participants, invites, comments, images, and tags
+- **Drinks**: Drink types, drinks with images, user drink tracking, and favorites
+- **Achievements**: User and session achievements with criteria
+- **Social**: Friendships with bidirectional relationships and notifications
+- **Users**: Extended ApplicationUser with audit tracking
 
 ## Getting Started
 
@@ -120,13 +137,37 @@ Key configuration options in `.env`:
 - `JWT_AUDIENCE`: JWT token audience
 - `JWT_EXPIRY_MINUTES`: JWT token expiration time in minutes
 
+## Implemented Features
+
+### Data Models & Repository Layer
+- ✅ Session management (drinking sessions, locations, participants, invites)
+- ✅ Comment and image support for sessions
+- ✅ Tag system for categorizing sessions
+- ✅ Drink catalog with types and images
+- ✅ User drink tracking per session
+- ✅ Favorite drinks for users
+- ✅ Achievement system (user and session achievements)
+- ✅ Friendship system with directional relationships
+- ✅ Notification system
+- ✅ Complete CRUD operations via repositories
+
 ## Planned Features
 
-- Round creation and management
-- Drink tracking
-- Social features for groups
+### API Endpoints (In Progress)
+- Session CRUD endpoints
+- Participant and invite management
+- Comment and image upload endpoints
+- Drink catalog endpoints
+- User statistics and achievements
+- Friendship management
+- Notification delivery
+
+### Additional Features
 - Payment tracking and splitting
-- Real-time notifications
+- Real-time notifications via SignalR
+- Image storage integration (S3/Azure Blob)
+- Search and filtering
+- Analytics and reporting
 
 ## Development
 
@@ -183,7 +224,9 @@ The project uses GitHub Actions for continuous integration:
   - `DTOs/` - Data transfer objects
   - `Endpoints/` - Minimal API endpoints
   - `Migrations/` - EF Core migrations
-  - `Models/` - Domain models
+  - `Models/` - Domain models (17+ entities)
+  - `Repositories/` - Repository implementations
+    - `IRepositories/` - Repository interfaces
   - `Services/` - Business logic and services
 - `RoundsApp.Tests/` - Test project
   - Unit and integration tests
@@ -191,6 +234,7 @@ The project uses GitHub Actions for continuous integration:
   - `workflows/` - CI/CD pipelines
   - `ISSUE_TEMPLATE/` - Issue templates
   - `pull_request_template.md` - PR template
+- `data_model.mermaid` - Complete database schema diagram
 
 ## Contributing
 

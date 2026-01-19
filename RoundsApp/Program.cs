@@ -10,6 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 using RoundsApp.Data;
 using RoundsApp.Endpoints;
 using RoundsApp.Models;
+using RoundsApp.Repositories;
+using RoundsApp.Repositories.IRepositories;
 using RoundsApp.Services;
 using Scalar.AspNetCore;
 using Serilog;
@@ -71,6 +73,25 @@ builder.Services.AddAuthorization();
 // Add Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+// Add Repositories
+builder.Services.AddScoped<IAchievementRepository, AchievementRepository>();
+builder.Services.AddScoped<IDrinkRepository, DrinkRepository>();
+builder.Services.AddScoped<IDrinkTypeRepository, DrinkTypeRepository>();
+builder.Services.AddScoped<IDrinkImageRepository, DrinkImageRepository>();
+builder.Services.AddScoped<IDrinkingSessionRepository, DrinkingSessionRepository>();
+builder.Services.AddScoped<IFriendshipRepository, FriendshipRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<ISessionAchievementRepository, SessionAchievementRepository>();
+builder.Services.AddScoped<ISessionCommentRepository, SessionCommentRepository>();
+builder.Services.AddScoped<ISessionImageRepository, SessionImageRepository>();
+builder.Services.AddScoped<ISessionInviteRepository, SessionInviteRepository>();
+builder.Services.AddScoped<ISessionLocationRepository, SessionLocationRepository>();
+builder.Services.AddScoped<ISessionParticipantRepository, SessionParticipantRepository>();
+builder.Services.AddScoped<ISessionTagRepository, SessionTagRepository>();
+builder.Services.AddScoped<IUserAchievementRepository, UserAchievementRepository>();
+builder.Services.AddScoped<IUserDrinkRepository, UserDrinkRepository>();
+builder.Services.AddScoped<IUserFavouriteDrinkRepository, UserFavouriteDrinkRepository>();
+
 // Add OpenAPI
 builder.Services.AddOpenApi();
 
@@ -108,6 +129,14 @@ app.UseAuthorization();
 
 // Map Endpoints
 app.MapAuthEndpoints();
+app.MapSessionEndpoints();
+app.MapDrinkEndpoints();
+app.MapDrinkTypeEndpoints();
+app.MapFriendshipEndpoints();
+app.MapAchievementEndpoints();
+app.MapNotificationEndpoints();
+app.MapSessionParticipantEndpoints();
+app.MapSessionCommentEndpoints();
 
 // Map Health Checks
 app.MapHealthChecks("/health");
