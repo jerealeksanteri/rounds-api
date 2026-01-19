@@ -263,7 +263,7 @@ public class SessionTagEndpointsTests : IClassFixture<WebApplicationFactory<Prog
         var getResponse = await this.client.GetAsync($"/api/session-tags/session/{sessionId}");
         var tags = await getResponse.Content.ReadFromJsonAsync<List<SessionTagResponse>>();
         tags.Should().NotBeNull();
-        tags!.Should().HaveCountGreaterOrEqualTo(2);
+        tags!.Count.Should().Be(2);
     }
 
     private async Task<string> RegisterAndLoginAsync()
