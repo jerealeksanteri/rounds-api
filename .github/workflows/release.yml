@@ -153,6 +153,8 @@ jobs:
 
     - name: Generate version tag
       id: tag
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         # Get the latest tag
         LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
@@ -164,9 +166,81 @@ jobs:
         MINOR=$(echo $VERSION | cut -d. -f2)
         PATCH=$(echo $VERSION | cut -d. -f3)
 
-        # Increment patch version
-        NEW_PATCH=$((PATCH + 1))
-        NEW_TAG="v${MAJOR}.${MINOR}.${NEW_PATCH}"
+        # Determine version bump based on PR labels and commit messages
+        PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+        HAS_BREAKING=false
+        HAS_FEATURE=false
+
+        # Get all PR numbers from merge commits since last tag
+        if [ -n "$PREV_TAG" ]; then
+          PR_NUMBERS=$(git log --pretty=format:"%s" "$PREV_TAG"..HEAD | grep -oP 'Merge pull request #\K\d+' || true)
+        else
+          PR_NUMBERS=$(git log --pretty=format:"%s" | grep -oP 'Merge pull request #\K\d+' || true)
+        fi
+
+        # Check labels for each PR
+        for PR_NUM in $PR_NUMBERS; do
+          echo "Checking PR #$PR_NUM for labels..."
+          LABELS=$(gh pr view $PR_NUM --json labels --jq '.labels[].name' || true)
+
+          if echo "$LABELS" | grep -qi "breaking"; then
+            HAS_BREAKING=true
+            echo "  Found breaking change label"
+          fi
+
+          if echo "$LABELS" | grep -qi "feature\|enhancement"; then
+            HAS_FEATURE=true
+            echo "  Found feature/enhancement label"
+          fi
+        done
+
+        # Fallback: Check commit messages for conventional commits
+        if [ -n "$PREV_TAG" ]; then
+          COMMITS=$(git log --pretty=format:"%s%n%b" "$PREV_TAG"..HEAD)
+        else
+          COMMITS=$(git log --pretty=format:"%s%n%b")
+        fi
+
+        # Check for BREAKING CHANGE in commit messages
+        if echo "$COMMITS" | grep -qi "BREAKING CHANGE"; then
+          HAS_BREAKING=true
+          echo "Found BREAKING CHANGE in commit message"
+        fi
+
+        # Check for conventional commit prefixes
+        if echo "$COMMITS" | grep -qiE "^feat(\(.*\))?!:|^[a-z]+(\(.*\))?!:"; then
+          HAS_BREAKING=true
+          echo "Found breaking change indicator (!) in conventional commit"
+        fi
+
+        if echo "$COMMITS" | grep -qiE "^feat(\(.*\))?:"; then
+          HAS_FEATURE=true
+          echo "Found feat: prefix in commit message"
+        fi
+
+        # Determine version bump
+        if [ "$HAS_BREAKING" = true ]; then
+          # Major version bump
+          NEW_MAJOR=$((MAJOR + 1))
+          NEW_MINOR=0
+          NEW_PATCH=0
+          echo "Version bump: MAJOR (breaking change detected)"
+        elif [ "$HAS_FEATURE" = true ]; then
+          # Minor version bump
+          NEW_MAJOR=$MAJOR
+          NEW_MINOR=$((MINOR + 1))
+          NEW_PATCH=0
+          echo "Version bump: MINOR (new feature detected)"
+        else
+          # Patch version bump
+          NEW_MAJOR=$MAJOR
+          NEW_MINOR=$MINOR
+          NEW_PATCH=$((PATCH + 1))
+          echo "Version bump: PATCH (bug fix or other changes)"
+        fi
+
+        NEW_TAG="v${NEW_MAJOR}.${NEW_MINOR}.${NEW_PATCH}"
 
         echo "New tag: $NEW_TAG"
         echo "TAG_NAME=$NEW_TAG" >> $GITHUB_OUTPUT
@@ -182,27 +256,25 @@ jobs:
         TAG_NAME="${{ steps.tag.outputs.TAG_NAME }}"
         REPO="${{ github.repository }}"
 
-        cat > release-notes.md << EOF
-        ## Release ${TAG_NAME}
-
+        cat > release-notes-header.md << 'EOF'
         ### Docker Images
 
-        \`\`\`bash
-        docker pull ghcr.io/${REPO}:${TAG_NAME}
-        docker pull ghcr.io/${REPO}:latest
-        \`\`\`
+        ```bash
+        docker pull ghcr.io/$REPO:$TAG_NAME
+        docker pull ghcr.io/$REPO:latest
+        ```
 
         ### Docker Compose Usage
 
-        \`\`\`yaml
+        ```yaml
         services:
           api:
-            image: ghcr.io/${REPO}:${TAG_NAME}
+            image: ghcr.io/$REPO:$TAG_NAME
             ports:
-              - "\${API_PORT:-5000}:8080"
+              - "${API_PORT:-5000}:8080"
             environment:
-              - ASPNETCORE_ENVIRONMENT=\${ASPNETCORE_ENVIRONMENT:-Production}
-              - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=\${POSTGRES_DB};Username=\${POSTGRES_USER};Password=\${POSTGRES_PASSWORD}
+              - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Production}
+              - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
             depends_on:
               postgres:
                 condition: service_healthy
@@ -213,15 +285,15 @@ jobs:
           postgres:
             image: postgres:18-alpine
             ports:
-              - "\${POSTGRES_PORT:-5432}:5432"
+              - "${POSTGRES_PORT:-5432}:5432"
             environment:
-              - POSTGRES_USER=\${POSTGRES_USER}
-              - POSTGRES_PASSWORD=\${POSTGRES_PASSWORD}
-              - POSTGRES_DB=\${POSTGRES_DB}
+              - POSTGRES_USER=${POSTGRES_USER}
+              - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+              - POSTGRES_DB=${POSTGRES_DB}
             volumes:
               - postgres-data:/var/lib/postgresql/data
             healthcheck:
-              test: ["CMD-SHELL", "pg_isready -U \${POSTGRES_USER} -d \${POSTGRES_DB}"]
+              test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
               interval: 10s
               timeout: 5s
               retries: 5
@@ -236,26 +308,23 @@ jobs:
         networks:
           rounds-network:
             driver: bridge
-        \`\`\`
+        ```
 
-        ### Changes
-
+        ---
         EOF
 
-        # Add commit history
-        PREV_TAG=\$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-        if [ -n "\$PREV_TAG" ]; then
-          git log --pretty=format:"- %s (%h)" "\$PREV_TAG"..HEAD >> release-notes.md
-        else
-          echo "- Initial release" >> release-notes.md
-        fi
+        # Replace placeholders in the header
+        sed -i "s|\$REPO|${REPO}|g" release-notes-header.md
+        sed -i "s|\$TAG_NAME|${TAG_NAME}|g" release-notes-header.md
 
     - name: Create GitHub Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        # Create release with auto-generated notes
         gh release create ${{ steps.tag.outputs.TAG_NAME }} \
           --title "Release ${{ steps.tag.outputs.TAG_NAME }}" \
-          --notes-file release-notes.md \
+          --generate-notes \
+          --notes-file release-notes-header.md \
           rounds-api-*.tar.gz \
           rounds-api-*.zip
