@@ -213,12 +213,11 @@ jobs:
         } >> $GITHUB_OUTPUT
 
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        name: Release ${{ steps.tag.outputs.TAG_NAME }}
-        body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
-        files: |
-          rounds-api-*.tar.gz
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create ${{ steps.tag.outputs.TAG_NAME }} \
+          --title "Release ${{ steps.tag.outputs.TAG_NAME }}" \
+          --notes "${{ steps.release_notes.outputs.RELEASE_NOTES }}" \
+          rounds-api-*.tar.gz \
           rounds-api-*.zip
-        draft: false
-        prerelease: false
