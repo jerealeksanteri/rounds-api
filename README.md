@@ -281,10 +281,53 @@ dotnet format
 
 ### CI/CD
 
-The project uses GitHub Actions for continuous integration:
-- **Build and Test**: Runs on every push and pull request
-- **Code Quality**: Checks code formatting and builds with warnings as errors
-- **Docker Build**: Validates Docker image builds
+The project uses GitHub Actions for continuous integration and automated releases:
+
+#### Build and Test Workflow
+- Runs on every push and pull request
+- Code quality checks (formatting, warnings as errors)
+- Validates Docker image builds
+
+#### Release Workflow
+The release workflow automatically creates new versions when code is merged to the `main` branch.
+
+**Semantic Versioning:**
+The workflow automatically determines version bumps based on PR labels:
+
+| Label | Version Bump | Example |
+|-------|--------------|---------|
+| `breaking-change` | MAJOR (x.0.0) | 1.2.3 → 2.0.0 |
+| `feature` or `enhancement` | MINOR (0.x.0) | 1.2.3 → 1.3.0 |
+| `bug`, `fix`, or no label | PATCH (0.0.x) | 1.2.3 → 1.2.4 |
+
+**How to Create a Release:**
+
+1. Create a PR from `dev` → `stage` → `main`
+2. Add appropriate labels to your PR:
+   - `breaking-change` - for breaking changes that require major version bump
+   - `feature` or `enhancement` - for new features that require minor version bump
+   - `bug` or `fix` - for bug fixes (or leave unlabeled for patch bump)
+3. Merge to `main` - the workflow will:
+   - Run all tests
+   - Build Docker images for multiple architectures (linux/amd64, linux/arm64)
+   - Build platform-specific binaries (Linux x64/ARM64, Windows x64)
+   - Automatically determine the version number based on PR labels
+   - Create a GitHub release with auto-generated release notes
+   - Publish Docker images to GitHub Container Registry
+   - Attach binaries to the release
+
+**Fallback: Conventional Commits**
+If PR labels are not used, the workflow falls back to detecting version bumps from commit messages:
+- `feat:` prefix or `feat!:` → MINOR or MAJOR bump
+- `BREAKING CHANGE:` in commit body → MAJOR bump
+- Other commits → PATCH bump
+
+**Release Artifacts:**
+Each release includes:
+- Docker images: `ghcr.io/jerealeksanteri/rounds-api:vX.Y.Z` and `:latest`
+- Binaries: `rounds-api-linux-x64.tar.gz`, `rounds-api-linux-arm64.tar.gz`, `rounds-api-win-x64.zip`
+- Auto-generated release notes with all merged PRs
+- Docker Compose usage examples
 
 ### Project Structure
 
