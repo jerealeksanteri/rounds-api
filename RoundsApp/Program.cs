@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RoundsApp.Data;
 using RoundsApp.Endpoints;
+using RoundsApp.Hubs;
 using RoundsApp.Models;
 using RoundsApp.Repositories;
 using RoundsApp.Repositories.IRepositories;
@@ -69,9 +70,32 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
     };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            // Extract token and path
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+
+            // If access token is present and path directs to hubs
+            var isHubsAuthenticated = !string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs");
+
+            // If is authenticated insert token into context
+            if (isHubsAuthenticated)
+            {
+                context.Token = accessToken;
+            }
+
+            return Task.CompletedTask;
+        },
+    };
 });
 
 builder.Services.AddAuthorization();
+builder.Services.AddSignalR();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // Add Services
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -147,6 +171,9 @@ app.MapNotificationEndpoints();
 
 // Map Health Checks
 app.MapHealthChecks("/health");
+
+// Map Hub
+app.MapHub<NotificationHub>("hubs/notifications");
 
 await app.RunAsync();
 

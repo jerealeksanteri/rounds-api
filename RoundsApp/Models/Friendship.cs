@@ -24,7 +24,7 @@ public class Friendship
     public ApplicationUser? Friend { get; set; }
 
     [Required]
-    public string Status { get; set; } = "pending";
+    public FriendshipStatus Status { get; set; } = FriendshipStatus.Pending;
 
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -41,4 +41,22 @@ public class Friendship
 
     [ForeignKey(nameof(UpdatedById))]
     public ApplicationUser? UpdatedBy { get; set; }
+}
+
+public enum FriendshipStatus
+{
+    /// <summary>
+    /// Pending status
+    /// </summary>
+    Pending,
+
+    /// <summary>
+    /// Accepted friend
+    /// </summary>
+    Accepted,
+
+    /// <summary>
+    /// Rejected friend
+    /// </summary>
+    Rejected,
 }

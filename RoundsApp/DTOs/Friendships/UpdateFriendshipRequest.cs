@@ -2,9 +2,11 @@
 // Copyright (c) RoundsApp. All rights reserved.
 // </copyright>
 
+using RoundsApp.Models;
+
 namespace RoundsApp.DTOs.Friendships;
 
 public class UpdateFriendshipRequest
 {
-    public string Status { get; set; } = string.Empty;
+    public FriendshipStatus Status { get; set; } = FriendshipStatus.Pending;
 }
