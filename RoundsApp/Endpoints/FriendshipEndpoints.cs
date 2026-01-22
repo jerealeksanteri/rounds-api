@@ -243,7 +243,9 @@ public static class FriendshipEndpoints
         }
 
         // Delete also the bi-direction (if it exists - only accepted friendships have bidirectional entries)
+#pragma warning disable S2234 // Arguments should be passed in the correct order - intentionally swapped for bidirectional delete
         await friendshipRepository.DeleteAsync(friendId, userId);
+#pragma warning restore S2234
 
         return Results.NoContent();
     }
