@@ -3,11 +3,13 @@
 // </copyright>
 
 using System.Security.Claims;
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using RoundsApp.DTOs.Friendships;
 using RoundsApp.DTOs.Users;
 using RoundsApp.Models;
 using RoundsApp.Repositories.IRepositories;
+using RoundsApp.Services;
 
 namespace RoundsApp.Endpoints;
 
@@ -108,6 +110,7 @@ public static class FriendshipEndpoints
         CreateFriendshipRequest request,
         ClaimsPrincipal user,
         IFriendshipRepository friendshipRepository,
+        INotificationService notificationService,
         UserManager<ApplicationUser> userManager)
     {
         var currentUser = await userManager.GetUserAsync(user);
@@ -116,14 +119,28 @@ public static class FriendshipEndpoints
             return Results.Unauthorized();
         }
 
+        var friend = await userManager.FindByIdAsync(request.FriendId.ToString());
+        if (friend == null)
+        {
+            return Results.NotFound(new { message = "Friend not found" });
+        }
+
         var friendship = new Friendship
         {
             UserId = currentUser.Id,
             FriendId = request.FriendId,
-            Status = "pending",
+            Status = FriendshipStatus.Pending,
             CreatedById = currentUser.Id,
             CreatedAt = DateTime.UtcNow,
         };
+
+        // Send notification to friend
+        await notificationService.CreateAndSendAsync(
+            request.FriendId,
+            "friend_request",
+            "New Friend Request",
+            $"{currentUser.UserName} sent you a friend request",
+            JsonSerializer.Serialize(new { userId = currentUser.Id }));
 
         var created = await friendshipRepository.CreateAsync(friendship);
         return Results.Created($"/api/friendships/{created.UserId}/{created.FriendId}", MapToResponse(created));
@@ -158,6 +175,26 @@ public static class FriendshipEndpoints
         friendship.UpdatedById = currentUser.Id;
         friendship.UpdatedAt = DateTime.UtcNow;
 
+        var isAccepted = request.Status == FriendshipStatus.Accepted;
+
+        // If friend was accepted, add bi-direction
+        if (isAccepted)
+        {
+            // Create bi-direction to friendship.
+            var newFriendship = new Friendship
+            {
+                UserId = friendship.FriendId,
+                FriendId = friendship.UserId,
+                Status = FriendshipStatus.Accepted,
+                CreatedById = currentUser.Id,
+                CreatedAt = DateTime.UtcNow,
+            };
+
+            await friendshipRepository.CreateAsync(newFriendship);
+
+            return Results.Ok(MapToResponse(newFriendship));
+        }
+
         var updated = await friendshipRepository.UpdateAsync(friendship);
         return Results.Ok(MapToResponse(updated));
     }
@@ -190,6 +227,13 @@ public static class FriendshipEndpoints
         if (!deleted)
         {
             return Results.Problem("Failed to delete friendship");
+        }
+
+        // Delete also the bi-direction
+        var deletedBidirection = await friendshipRepository.DeleteAsync(friendId, userId);
+        if (!deletedBidirection)
+        {
+            return Results.Problem("Failed to delete bidirection");
         }
 
         return Results.NoContent();
