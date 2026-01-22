@@ -125,6 +125,21 @@ public static class FriendshipEndpoints
             return Results.NotFound(new { message = "Friend not found" });
         }
 
+        // Query for existing records
+        var existingFriendship = await friendshipRepository.GetByIdAsync(currentUser.Id, request.FriendId);
+        var existingBidirection = await friendshipRepository.GetByIdAsync(request.FriendId, currentUser.Id);
+
+        // Check is there is existing relation between users which is not rejected.
+        var isExistingFriendship = existingFriendship is { Status: not FriendshipStatus.Rejected };
+        var isExistingBidirection = existingBidirection is { Status: not FriendshipStatus.Rejected };
+
+        var isRelationExisting = isExistingFriendship || isExistingBidirection;
+
+        if (isRelationExisting)
+        {
+            return Results.BadRequest(new { message = "Friendship relation already exists." });
+        }
+
         var friendship = new Friendship
         {
             UserId = currentUser.Id,
@@ -166,7 +181,8 @@ public static class FriendshipEndpoints
             return Results.NotFound(new { message = "Friendship not found" });
         }
 
-        if (friendship.FriendId != currentUser.Id && friendship.UserId != currentUser.Id)
+        // Only the recipient (FriendId) can accept/reject, but sender can cancel (delete)
+        if (friendship.FriendId != currentUser.Id)
         {
             return Results.Forbid();
         }
@@ -175,13 +191,13 @@ public static class FriendshipEndpoints
         friendship.UpdatedById = currentUser.Id;
         friendship.UpdatedAt = DateTime.UtcNow;
 
-        var isAccepted = request.Status == FriendshipStatus.Accepted;
+        // Update the original friendship first
+        var updated = await friendshipRepository.UpdateAsync(friendship);
 
-        // If friend was accepted, add bi-direction
-        if (isAccepted)
+        // If accepted, also create the bi-directional entry
+        if (request.Status == FriendshipStatus.Accepted)
         {
-            // Create bi-direction to friendship.
-            var newFriendship = new Friendship
+            var bidirectionalFriendship = new Friendship
             {
                 UserId = friendship.FriendId,
                 FriendId = friendship.UserId,
@@ -190,12 +206,9 @@ public static class FriendshipEndpoints
                 CreatedAt = DateTime.UtcNow,
             };
 
-            await friendshipRepository.CreateAsync(newFriendship);
-
-            return Results.Ok(MapToResponse(newFriendship));
+            await friendshipRepository.CreateAsync(bidirectionalFriendship);
         }
 
-        var updated = await friendshipRepository.UpdateAsync(friendship);
         return Results.Ok(MapToResponse(updated));
     }
 
