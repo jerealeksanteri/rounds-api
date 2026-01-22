@@ -8,6 +8,7 @@ using RoundsApp.DTOs.Sessions;
 using RoundsApp.DTOs.Users;
 using RoundsApp.Models;
 using RoundsApp.Repositories.IRepositories;
+using RoundsApp.Services;
 
 namespace RoundsApp.Endpoints;
 
@@ -107,12 +108,26 @@ public static class SessionInviteEndpoints
         CreateSessionInviteRequest request,
         ClaimsPrincipal user,
         ISessionInviteRepository inviteRepository,
+        IDrinkingSessionRepository drinkingSessionRepository,
+        INotificationService notificationService,
         UserManager<ApplicationUser> userManager)
     {
         var currentUser = await userManager.GetUserAsync(user);
         if (currentUser == null)
         {
             return Results.Unauthorized();
+        }
+
+        var session = await drinkingSessionRepository.GetByIdAsync(request.SessionId);
+        if (session == null)
+        {
+            return Results.NotFound(new { message = "Session not found" });
+        }
+
+        var invitedUser = await userManager.FindByIdAsync(request.UserId.ToString());
+        if (invitedUser == null)
+        {
+            return Results.NotFound(new { message = "User not found" });
         }
 
         var invite = new SessionInvite
@@ -126,6 +141,13 @@ public static class SessionInviteEndpoints
         };
 
         var created = await inviteRepository.CreateAsync(invite);
+
+        await notificationService.CreateAndSendAsync(
+            request.UserId,
+            "session_invite",
+            "New Session Invite",
+            $"You have been invited to join session {session.Name} by {currentUser.UserName}");
+
         return Results.Created($"/api/session-invites/{created.Id}", MapToResponse(created));
     }
 
