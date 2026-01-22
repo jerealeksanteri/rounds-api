@@ -229,12 +229,8 @@ public static class FriendshipEndpoints
             return Results.Problem("Failed to delete friendship");
         }
 
-        // Delete also the bi-direction
-        var deletedBidirection = await friendshipRepository.DeleteAsync(friendId, userId);
-        if (!deletedBidirection)
-        {
-            return Results.Problem("Failed to delete bidirection");
-        }
+        // Delete also the bi-direction (if it exists - only accepted friendships have bidirectional entries)
+        await friendshipRepository.DeleteAsync(friendId, userId);
 
         return Results.NoContent();
     }
