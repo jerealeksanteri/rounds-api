@@ -275,6 +275,36 @@ namespace RoundsApp.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("RoundsApp.Models.CommentMention", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CommentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Length")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("MentionedUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("StartPosition")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommentId");
+
+                    b.HasIndex("MentionedUserId");
+
+                    b.ToTable("CommentMentions");
+                });
+
             modelBuilder.Entity("RoundsApp.Models.Drink", b =>
                 {
                     b.Property<Guid>("Id")
@@ -996,6 +1026,25 @@ namespace RoundsApp.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
+            modelBuilder.Entity("RoundsApp.Models.CommentMention", b =>
+                {
+                    b.HasOne("RoundsApp.Models.SessionComment", "Comment")
+                        .WithMany("Mentions")
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RoundsApp.Models.ApplicationUser", "MentionedUser")
+                        .WithMany()
+                        .HasForeignKey("MentionedUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("MentionedUser");
+                });
+
             modelBuilder.Entity("RoundsApp.Models.Drink", b =>
                 {
                     b.HasOne("RoundsApp.Models.ApplicationUser", "CreatedBy")
@@ -1501,6 +1550,11 @@ namespace RoundsApp.Migrations
             modelBuilder.Entity("RoundsApp.Models.FriendGroup", b =>
                 {
                     b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("RoundsApp.Models.SessionComment", b =>
+                {
+                    b.Navigation("Mentions");
                 });
 
             modelBuilder.Entity("RoundsApp.Models.SessionLocation", b =>
