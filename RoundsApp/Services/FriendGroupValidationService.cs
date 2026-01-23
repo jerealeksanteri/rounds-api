@@ -2,6 +2,7 @@
 // Copyright (c) RoundsApp. All rights reserved.
 // </copyright>
 
+using RoundsApp.Models;
 using RoundsApp.Repositories.IRepositories;
 
 namespace RoundsApp.Services;
@@ -20,14 +21,14 @@ public class FriendGroupValidationService : IFriendGroupValidationService
         var friends = await _friendshipRepository.GetFriendsByUserIdAsync(userId);
         return friends.Any(f =>
             (f.UserId == friendId || f.FriendId == friendId) &&
-            f.Status == "accepted");
+            f.Status == FriendshipStatus.Accepted);
     }
 
     public async Task<bool> AreAllFriendsAsync(Guid userId, IEnumerable<Guid> friendIds)
     {
         var friends = await _friendshipRepository.GetFriendsByUserIdAsync(userId);
         var acceptedFriendIds = friends
-            .Where(f => f.Status == "accepted")
+            .Where(f => f.Status == FriendshipStatus.Accepted)
             .Select(f => f.UserId == userId ? f.FriendId : f.UserId)
             .ToHashSet();
 
@@ -38,7 +39,7 @@ public class FriendGroupValidationService : IFriendGroupValidationService
     {
         var friends = await _friendshipRepository.GetFriendsByUserIdAsync(userId);
         var acceptedFriendIds = friends
-            .Where(f => f.Status == "accepted")
+            .Where(f => f.Status == FriendshipStatus.Accepted)
             .Select(f => f.UserId == userId ? f.FriendId : f.UserId)
             .ToHashSet();
 

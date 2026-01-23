@@ -99,6 +99,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // Add Services
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IFriendGroupValidationService, FriendGroupValidationService>();
 
 // Add Repositories
 builder.Services.AddScoped<IAchievementRepository, AchievementRepository>();
@@ -107,6 +108,8 @@ builder.Services.AddScoped<IDrinkTypeRepository, DrinkTypeRepository>();
 builder.Services.AddScoped<IDrinkImageRepository, DrinkImageRepository>();
 builder.Services.AddScoped<IDrinkingSessionRepository, DrinkingSessionRepository>();
 builder.Services.AddScoped<IFriendshipRepository, FriendshipRepository>();
+builder.Services.AddScoped<IFriendGroupRepository, FriendGroupRepository>();
+builder.Services.AddScoped<IFriendGroupMemberRepository, FriendGroupMemberRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<ISessionAchievementRepository, SessionAchievementRepository>();
 builder.Services.AddScoped<ISessionCommentRepository, SessionCommentRepository>();
@@ -166,6 +169,7 @@ app.MapSessionLocationEndpoints();
 app.MapDrinkEndpoints();
 app.MapDrinkTypeEndpoints();
 app.MapFriendshipEndpoints();
+app.MapFriendGroupEndpoints();
 app.MapAchievementEndpoints();
 app.MapNotificationEndpoints();
 
