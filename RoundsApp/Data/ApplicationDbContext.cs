@@ -50,6 +50,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
     public DbSet<Friendship> Friendships { get; set; } = null!;
 
+    public DbSet<FriendGroup> FriendGroups { get; set; } = null!;
+
+    public DbSet<FriendGroupMember> FriendGroupMembers { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -285,6 +289,24 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             entity.HasOne(n => n.User)
                 .WithMany()
                 .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<FriendGroup>(entity =>
+        {
+            entity.HasOne(fg => fg.Owner)
+                .WithMany()
+                .HasForeignKey(fg => fg.OwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(a => a.CreatedBy)
+                .WithMany()
+                .HasForeignKey(a => a.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(a => a.UpdatedBy)
+                .WithMany()
+                .HasForeignKey(a => a.UpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
         });
     }

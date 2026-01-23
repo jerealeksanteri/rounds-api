@@ -32,10 +32,11 @@ public class FriendGroup
     [ForeignKey(nameof(CreatedById))]
     public ApplicationUser? CreatedBy { get; set; }
 
-    public DateTime UpdatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 
-    public Guid UpdatedById { get; set; }
+    public Guid? UpdatedById { get; set; }
 
+    [ForeignKey(nameof(UpdatedById))]
     public ApplicationUser? UpdatedBy { get; set; }
 
     public ICollection<FriendGroupMember> Members { get; set; } = new List<FriendGroupMember>();
