@@ -3,11 +3,13 @@
 // </copyright>
 
 using System.Security.Claims;
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using RoundsApp.DTOs.Friendships;
 using RoundsApp.DTOs.Users;
 using RoundsApp.Models;
 using RoundsApp.Repositories.IRepositories;
+using RoundsApp.Services;
 
 namespace RoundsApp.Endpoints;
 
@@ -108,6 +110,7 @@ public static class FriendshipEndpoints
         CreateFriendshipRequest request,
         ClaimsPrincipal user,
         IFriendshipRepository friendshipRepository,
+        INotificationService notificationService,
         UserManager<ApplicationUser> userManager)
     {
         var currentUser = await userManager.GetUserAsync(user);
@@ -116,14 +119,43 @@ public static class FriendshipEndpoints
             return Results.Unauthorized();
         }
 
+        var friend = await userManager.FindByIdAsync(request.FriendId.ToString());
+        if (friend == null)
+        {
+            return Results.NotFound(new { message = "Friend not found" });
+        }
+
+        // Query for existing records
+        var existingFriendship = await friendshipRepository.GetByIdAsync(currentUser.Id, request.FriendId);
+        var existingBidirection = await friendshipRepository.GetByIdAsync(request.FriendId, currentUser.Id);
+
+        // Check is there is existing relation between users which is not rejected.
+        var isExistingFriendship = existingFriendship is { Status: not FriendshipStatus.Rejected };
+        var isExistingBidirection = existingBidirection is { Status: not FriendshipStatus.Rejected };
+
+        var isRelationExisting = isExistingFriendship || isExistingBidirection;
+
+        if (isRelationExisting)
+        {
+            return Results.BadRequest(new { message = "Friendship relation already exists." });
+        }
+
         var friendship = new Friendship
         {
             UserId = currentUser.Id,
             FriendId = request.FriendId,
-            Status = "pending",
+            Status = FriendshipStatus.Pending,
             CreatedById = currentUser.Id,
             CreatedAt = DateTime.UtcNow,
         };
+
+        // Send notification to friend
+        await notificationService.CreateAndSendAsync(
+            request.FriendId,
+            "friend_request",
+            "New Friend Request",
+            $"{currentUser.UserName} sent you a friend request",
+            JsonSerializer.Serialize(new { userId = currentUser.Id }));
 
         var created = await friendshipRepository.CreateAsync(friendship);
         return Results.Created($"/api/friendships/{created.UserId}/{created.FriendId}", MapToResponse(created));
@@ -149,7 +181,8 @@ public static class FriendshipEndpoints
             return Results.NotFound(new { message = "Friendship not found" });
         }
 
-        if (friendship.FriendId != currentUser.Id && friendship.UserId != currentUser.Id)
+        // Only the recipient (FriendId) can accept/reject, but sender can cancel (delete)
+        if (friendship.FriendId != currentUser.Id)
         {
             return Results.Forbid();
         }
@@ -158,7 +191,24 @@ public static class FriendshipEndpoints
         friendship.UpdatedById = currentUser.Id;
         friendship.UpdatedAt = DateTime.UtcNow;
 
+        // Update the original friendship first
         var updated = await friendshipRepository.UpdateAsync(friendship);
+
+        // If accepted, also create the bi-directional entry
+        if (request.Status == FriendshipStatus.Accepted)
+        {
+            var bidirectionalFriendship = new Friendship
+            {
+                UserId = friendship.FriendId,
+                FriendId = friendship.UserId,
+                Status = FriendshipStatus.Accepted,
+                CreatedById = currentUser.Id,
+                CreatedAt = DateTime.UtcNow,
+            };
+
+            await friendshipRepository.CreateAsync(bidirectionalFriendship);
+        }
+
         return Results.Ok(MapToResponse(updated));
     }
 
@@ -191,6 +241,11 @@ public static class FriendshipEndpoints
         {
             return Results.Problem("Failed to delete friendship");
         }
+
+        // Delete also the bi-direction (if it exists - only accepted friendships have bidirectional entries)
+#pragma warning disable S2234 // Arguments should be passed in the correct order - intentionally swapped for bidirectional delete
+        await friendshipRepository.DeleteAsync(friendId, userId);
+#pragma warning restore S2234
 
         return Results.NoContent();
     }
