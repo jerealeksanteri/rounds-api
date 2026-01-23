@@ -3,6 +3,7 @@
 // </copyright>
 
 using RoundsApp.DTOs.Users;
+using RoundsApp.Models;
 
 namespace RoundsApp.DTOs.Friendships;
 
@@ -16,7 +17,7 @@ public class FriendshipResponse
 
     public UserResponse? Friend { get; set; }
 
-    public string Status { get; set; } = string.Empty;
+    public FriendshipStatus Status { get; set; } = FriendshipStatus.Pending;
 
     public DateTime CreatedAt { get; set; }
 

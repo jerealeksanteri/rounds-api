@@ -77,7 +77,7 @@ public class FriendshipRepository : IFriendshipRepository
         return await this.context.Set<Friendship>()
             .Include(f => f.User)
             .Include(f => f.Friend)
-            .Where(f => (f.UserId == userId || f.FriendId == userId) && f.Status == "accepted")
+            .Where(f => (f.UserId == userId || f.FriendId == userId) && f.Status == FriendshipStatus.Accepted)
             .ToListAsync();
     }
 
@@ -86,7 +86,7 @@ public class FriendshipRepository : IFriendshipRepository
         return await this.context.Set<Friendship>()
             .Include(f => f.User)
             .Include(f => f.Friend)
-            .Where(f => f.FriendId == userId && f.Status == "pending")
+            .Where(f => f.FriendId == userId && f.Status == FriendshipStatus.Pending)
             .ToListAsync();
     }
 
@@ -95,7 +95,7 @@ public class FriendshipRepository : IFriendshipRepository
         return await this.context.Set<Friendship>()
             .Include(f => f.User)
             .Include(f => f.Friend)
-            .Where(f => f.UserId == userId && f.Status == "pending")
+            .Where(f => f.UserId == userId && f.Status == FriendshipStatus.Pending)
             .ToListAsync();
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using RoundsApp.Data;
@@ -11,9 +12,11 @@ using RoundsApp.Data;
 namespace RoundsApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260122203503_FriendshipStatusEnum")]
+    partial class FriendshipStatusEnum
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -436,70 +439,6 @@ namespace RoundsApp.Migrations
                     b.HasIndex("UpdatedById");
 
                     b.ToTable("DrinkingSessions");
-                });
-
-            modelBuilder.Entity("RoundsApp.Models.FriendGroup", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("CreatedById")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<Guid>("OwnerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("UpdatedById")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("OwnerId");
-
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("FriendGroups");
-                });
-
-            modelBuilder.Entity("RoundsApp.Models.FriendGroupMember", b =>
-                {
-                    b.Property<Guid>("GroupId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("AddedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("AddedById")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("GroupId", "UserId");
-
-                    b.HasIndex("AddedById");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("FriendGroupMembers");
                 });
 
             modelBuilder.Entity("RoundsApp.Models.Friendship", b =>
@@ -1090,59 +1029,6 @@ namespace RoundsApp.Migrations
                     b.Navigation("UpdatedBy");
                 });
 
-            modelBuilder.Entity("RoundsApp.Models.FriendGroup", b =>
-                {
-                    b.HasOne("RoundsApp.Models.ApplicationUser", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("RoundsApp.Models.ApplicationUser", "Owner")
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("RoundsApp.Models.ApplicationUser", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("CreatedBy");
-
-                    b.Navigation("Owner");
-
-                    b.Navigation("UpdatedBy");
-                });
-
-            modelBuilder.Entity("RoundsApp.Models.FriendGroupMember", b =>
-                {
-                    b.HasOne("RoundsApp.Models.ApplicationUser", "AddedBy")
-                        .WithMany()
-                        .HasForeignKey("AddedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("RoundsApp.Models.FriendGroup", "Group")
-                        .WithMany("Members")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RoundsApp.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AddedBy");
-
-                    b.Navigation("Group");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("RoundsApp.Models.Friendship", b =>
                 {
                     b.HasOne("RoundsApp.Models.ApplicationUser", "CreatedBy")
@@ -1496,11 +1382,6 @@ namespace RoundsApp.Migrations
                     b.Navigation("Participants");
 
                     b.Navigation("Tags");
-                });
-
-            modelBuilder.Entity("RoundsApp.Models.FriendGroup", b =>
-                {
-                    b.Navigation("Members");
                 });
 
             modelBuilder.Entity("RoundsApp.Models.SessionLocation", b =>

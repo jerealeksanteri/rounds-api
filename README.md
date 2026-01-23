@@ -13,7 +13,7 @@ This project is in active development. Core infrastructure is complete with:
 - ✅ Repository layer with complete CRUD operations
 - ✅ JWT authentication and authorization
 - ✅ Comprehensive REST API endpoints
-- ✅ 135 integration tests (all passing)
+- ✅ 168 integration tests (all passing)
 - ✅ CI/CD pipeline with GitHub Actions
 
 ## Tech Stack
@@ -57,7 +57,7 @@ This project is in active development. Core infrastructure is complete with:
 - **Sessions**: Drinking sessions with locations, participants, invites, comments, images, and tags
 - **Drinks**: Drink types, drinks with images, user drink tracking, and favorites
 - **Achievements**: User and session achievements with criteria
-- **Social**: Friendships with bidirectional relationships and notifications
+- **Social**: Friendships with bidirectional relationships, friend groups, and notifications
 - **Users**: Extended ApplicationUser with audit tracking
 
 ## Getting Started
@@ -156,6 +156,7 @@ Key configuration options in `.env`:
 - ✅ Favorite drinks for users
 - ✅ Achievement system (user and session achievements)
 - ✅ Friendship system with directional relationships
+- ✅ Friend groups for organizing friends
 - ✅ Notification system
 - ✅ Audit tracking (CreatedBy, CreatedAt, UpdatedBy, UpdatedAt)
 
@@ -194,6 +195,10 @@ Key configuration options in `.env`:
 - ✅ Get sent friend requests
 - ✅ Accept/reject friend requests
 - ✅ Authorization checks for friendship operations
+- ✅ Friend group CRUD operations (create, update, delete)
+- ✅ Add/remove members to friend groups
+- ✅ Bulk invite friend group to session
+- ✅ Validation that only friends can be added to groups
 - ✅ Notification CRUD operations
 - ✅ Get unread notifications
 - ✅ Mark notifications as read
@@ -204,7 +209,7 @@ Key configuration options in `.env`:
 - ✅ JSON criteria storage for achievement conditions
 
 ### Testing
-- ✅ Comprehensive integration tests for all endpoints (135 tests)
+- ✅ Comprehensive integration tests for all endpoints (168 tests)
 - ✅ Test coverage for authentication flows
 - ✅ Test coverage for authorization and access control
 - ✅ Validation testing for required fields
@@ -228,7 +233,7 @@ Key configuration options in `.env`:
 
 ### Running Tests
 
-The project has 135 integration tests covering all API endpoints.
+The project has 168 integration tests covering all API endpoints.
 
 Run all tests:
 ```bash
