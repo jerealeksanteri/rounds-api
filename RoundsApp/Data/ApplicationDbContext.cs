@@ -309,5 +309,25 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                 .HasForeignKey(a => a.UpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
         });
+
+        builder.Entity<FriendGroupMember>(entity =>
+        {
+            entity.HasKey(m => new { m.GroupId, m.UserId });
+
+            entity.HasOne(m => m.Group)
+                .WithMany(g => g.Members)
+                .HasForeignKey(m => m.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(m => m.User)
+                .WithMany()
+                .HasForeignKey(m => m.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(m => m.AddedBy)
+                .WithMany()
+                .HasForeignKey(m => m.AddedById)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 }

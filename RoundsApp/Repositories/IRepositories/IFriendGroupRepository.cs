@@ -11,6 +11,6 @@ public interface IFriendGroupRepository
     Task<FriendGroup> CreateAsync(FriendGroup friendGroup);
     Task<FriendGroup> UpdateAsync(FriendGroup friendGroup);
     Task<bool> DeleteAsync(FriendGroup friendGroup);
-    Task<IEnumerable<FriendGroup>> GetByOwnerIdAsync(Guid id);
-    Task<IEnumerable<FriendGroup>> GetByFriendIdAsync(Guid id);
+    Task<IEnumerable<FriendGroup>> GetByOwnerIdAsync(Guid ownerId);
+    Task<IEnumerable<FriendGroup>> GetByFriendIdAsync(Guid userId);
 }
