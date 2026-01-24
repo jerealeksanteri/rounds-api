@@ -69,12 +69,21 @@ public static class SessionCommentEndpoints
         CreateCommentRequest request,
         ClaimsPrincipal user,
         ISessionCommentRepository commentRepository,
+        IDrinkingSessionRepository sessionRepository,
+        IMentionService mentionService,
+        INotificationService notificationService,
         UserManager<ApplicationUser> userManager)
     {
         var currentUser = await userManager.GetUserAsync(user);
         if (currentUser == null)
         {
             return Results.Unauthorized();
+        }
+
+        var session = await sessionRepository.GetByIdAsync(request.SessionId);
+        if (session == null)
+        {
+            return Results.NotFound(new { message = "Session not found" });
         }
 
         var comment = new SessionComment
@@ -88,7 +97,33 @@ public static class SessionCommentEndpoints
         };
 
         var created = await commentRepository.CreateAsync(comment);
-        return Results.Created($"/api/session-comments/{created.Id}", MapToResponse(created));
+
+        // Parse and create mentions
+        var mentions = await mentionService.ParseAndCreateMentionsAsync(
+            created.Id,
+            created.Content,
+            currentUser.Id);
+
+        // Send notifications to mentioned users (excluding self-mentions)
+        foreach (var mention in mentions)
+        {
+            if (mention.MentionedUserId != currentUser.Id)
+            {
+                await notificationService.CreateAndSendAsync(
+                    mention.MentionedUserId,
+                    "mention",
+                    "You were mentioned",
+                    $"{currentUser.UserName} mentioned you in a comment",
+                    JsonSerializer.Serialize(new
+                    {
+                        commentId = created.Id,
+                        sessionId = request.SessionId,
+                        sessionName = session.Name,
+                    }));
+            }
+        }
+
+        return Results.Created($"/api/session-comments/{created.Id}", MapToResponse(created, mentions));
     }
 
     private static async Task<IResult> UpdateComment(
@@ -96,6 +131,10 @@ public static class SessionCommentEndpoints
         UpdateCommentRequest request,
         ClaimsPrincipal user,
         ISessionCommentRepository commentRepository,
+        ICommentMentionRepository mentionRepository,
+        IDrinkingSessionRepository sessionRepository,
+        IMentionService mentionService,
+        INotificationService notificationService,
         UserManager<ApplicationUser> userManager)
     {
         var currentUser = await userManager.GetUserAsync(user);
@@ -115,12 +154,45 @@ public static class SessionCommentEndpoints
             return Results.Forbid();
         }
 
+        // Get old mentions for comparison
+        var oldMentions = await mentionRepository.GetByCommentIdAsync(id);
+        var oldMentionedUserIds = oldMentions.Select(m => m.MentionedUserId).ToHashSet();
+
         comment.Content = request.Content;
         comment.UpdatedById = currentUser.Id;
         comment.UpdatedAt = DateTime.UtcNow;
 
         var updated = await commentRepository.UpdateAsync(comment);
-        return Results.Ok(MapToResponse(updated));
+
+        // Delete old mentions and create new ones
+        await mentionRepository.DeleteByCommentIdAsync(id);
+        var newMentions = await mentionService.ParseAndCreateMentionsAsync(
+            id,
+            updated.Content,
+            currentUser.Id);
+
+        // Send notifications to newly mentioned users only
+        var session = await sessionRepository.GetByIdAsync(comment.SessionId);
+        foreach (var mention in newMentions)
+        {
+            if (mention.MentionedUserId != currentUser.Id &&
+                !oldMentionedUserIds.Contains(mention.MentionedUserId))
+            {
+                await notificationService.CreateAndSendAsync(
+                    mention.MentionedUserId,
+                    "mention",
+                    "You were mentioned",
+                    $"{currentUser.UserName} mentioned you in a comment",
+                    JsonSerializer.Serialize(new
+                    {
+                        commentId = id,
+                        sessionId = comment.SessionId,
+                        sessionName = session?.Name,
+                    }));
+            }
+        }
+
+        return Results.Ok(MapToResponse(updated, newMentions));
     }
 
     private static async Task<IResult> DeleteComment(
@@ -155,7 +227,7 @@ public static class SessionCommentEndpoints
         return Results.NoContent();
     }
 
-    private static CommentResponse MapToResponse(SessionComment comment)
+    private static CommentResponse MapToResponse(SessionComment comment, IEnumerable<CommentMention>? mentions = null)
     {
         return new CommentResponse
         {
@@ -167,6 +239,15 @@ public static class SessionCommentEndpoints
             CreatedAt = comment.CreatedAt,
             CreatedById = comment.CreatedById,
             UpdatedAt = comment.UpdatedAt,
+            Mentions = mentions?.Select(m => new CommentMentionResponse
+            {
+                Id = m.Id,
+                CommentId = m.CommentId,
+                MentionedUserId = m.MentionedUserId,
+                MentionedUser = m.MentionedUser != null ? MapUserToResponse(m.MentionedUser) : null,
+                StartPosition = m.StartPosition,
+                Length = m.Length,
+            }).ToList() ??[],
         };
     }
 
