@@ -13,7 +13,7 @@ This project is in active development. Core infrastructure is complete with:
 - ✅ Repository layer with complete CRUD operations
 - ✅ JWT authentication and authorization
 - ✅ Comprehensive REST API endpoints
-- ✅ 168 integration tests (all passing)
+- ✅ 189 integration tests (all passing)
 - ✅ CI/CD pipeline with GitHub Actions
 
 ## Tech Stack
@@ -54,11 +54,18 @@ This project is in active development. Core infrastructure is complete with:
 - Code formatting standards with .editorconfig
 
 ### Domain Models
-- **Sessions**: Drinking sessions with locations, participants, invites, comments, images, and tags
+- **Sessions**: Drinking sessions with locations, participants, invites, comments (with @mentions), images, and tags
 - **Drinks**: Drink types, drinks with images, user drink tracking, and favorites
 - **Achievements**: User and session achievements with criteria
-- **Social**: Friendships with bidirectional relationships, friend groups, and notifications
+- **Social**: Friendships with bidirectional relationships, friend groups with bulk session invites, and real-time notifications via SignalR
 - **Users**: Extended ApplicationUser with audit tracking
+
+### Real-Time Features
+- SignalR hub for instant notification delivery
+- User mention notifications (@username in comments)
+- Session invite notifications
+- Friend request notifications
+- WebSocket connection with JWT authentication
 
 ## Getting Started
 
@@ -128,6 +135,33 @@ Once the application is running, access the API documentation at:
 - Scalar UI: `http://localhost:5001/scalar/v1`
 - OpenAPI JSON: `http://localhost:5001/openapi/v1.json`
 - Health Check: `http://localhost:5001/health`
+- SignalR Hub: `ws://localhost:5001/hubs/notifications` (with JWT token)
+
+## Real-Time Notifications
+
+The API uses SignalR for real-time notification delivery. Connect to the hub with a valid JWT token:
+
+```javascript
+const connection = new signalR.HubConnectionBuilder()
+    .withUrl("/hubs/notifications", {
+        accessTokenFactory: () => getAccessToken()
+    })
+    .withAutomaticReconnect()
+    .build();
+
+connection.on("ReceiveNotification", (notification) => {
+    console.log("New notification:", notification);
+});
+
+await connection.start();
+```
+
+### Notification Types
+| Type | Trigger | Metadata |
+|------|---------|----------|
+| `session_invite` | User invited to session | `{ sessionId, inviteId }` |
+| `friend_request` | Friend request received | `{ userId }` |
+| `mention` | @mentioned in comment | `{ commentId, sessionId, sessionName }` |
 
 ## Configuration
 
@@ -174,7 +208,7 @@ Key configuration options in `.env`:
 - ✅ Get sessions by user ID
 - ✅ Get upcoming sessions
 - ✅ Session participant management (add, remove, update status)
-- ✅ Session comment management (create, update, delete)
+- ✅ Session comment management (create, update, delete) with @username mentions
 - ✅ Session invite management (create, accept, reject)
 - ✅ Session tag management (create, delete)
 - ✅ Session location management (create, update, delete)
@@ -198,10 +232,14 @@ Key configuration options in `.env`:
 - ✅ Friend group CRUD operations (create, update, delete)
 - ✅ Add/remove members to friend groups
 - ✅ Bulk invite friend group to session
-- ✅ Validation that only friends can be added to groups
+- ✅ Validation that only accepted friends can be added to groups
 - ✅ Notification CRUD operations
 - ✅ Get unread notifications
 - ✅ Mark notifications as read
+- ✅ Real-time notifications via SignalR WebSocket hub
+- ✅ User mention notifications (@username in comments)
+- ✅ Session invite notifications
+- ✅ Friend request notifications
 
 #### Achievements
 - ✅ Achievement CRUD operations (GET, POST, PUT, DELETE)
@@ -209,7 +247,8 @@ Key configuration options in `.env`:
 - ✅ JSON criteria storage for achievement conditions
 
 ### Testing
-- ✅ Comprehensive integration tests for all endpoints (168 tests)
+- ✅ Comprehensive integration tests for all endpoints (189 tests)
+- ✅ Unit tests for business logic services
 - ✅ Test coverage for authentication flows
 - ✅ Test coverage for authorization and access control
 - ✅ Validation testing for required fields
@@ -223,7 +262,6 @@ Key configuration options in `.env`:
 - User favorite drinks endpoints
 - User and session achievements assignment
 - Payment tracking and splitting
-- Real-time notifications via SignalR
 - Advanced search and filtering capabilities
 - Analytics and reporting dashboards
 - Profile management endpoints
@@ -233,7 +271,7 @@ Key configuration options in `.env`:
 
 ### Running Tests
 
-The project has 168 integration tests covering all API endpoints.
+The project has 189 tests (integration and unit tests) covering all API endpoints and business logic.
 
 Run all tests:
 ```bash

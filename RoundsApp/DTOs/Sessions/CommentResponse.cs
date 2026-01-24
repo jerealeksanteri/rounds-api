@@ -23,4 +23,6 @@ public class CommentResponse
     public Guid CreatedById { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
+
+    public List<CommentMentionResponse> Mentions { get; set; } = new();
 }
