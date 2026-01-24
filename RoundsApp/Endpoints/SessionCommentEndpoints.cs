@@ -170,24 +170,20 @@ public static class SessionCommentEndpoints
 
         // Send notifications to newly mentioned users only
         var session = await sessionRepository.GetByIdAsync(comment.SessionId);
-        foreach (var mention in newMentions)
-        {
-            if (mention.MentionedUserId != currentUser.Id &&
-                !oldMentionedUserIds.Contains(mention.MentionedUserId))
-            {
-                await notificationService.CreateAndSendAsync(
-                    mention.MentionedUserId,
-                    "mention",
-                    "You were mentioned",
-                    $"{currentUser.UserName} mentioned you in a comment",
-                    JsonSerializer.Serialize(new
-                    {
-                        commentId = id,
-                        sessionId = comment.SessionId,
-                        sessionName = session?.Name,
-                    }));
-            }
-        }
+        var newMentionNotificationTasks = newMentions
+            .Where(m => m.MentionedUserId != currentUser.Id && !oldMentionedUserIds.Contains(m.MentionedUserId))
+            .Select(m => notificationService.CreateAndSendAsync(
+                m.MentionedUserId,
+                "mention",
+                "You were mentioned",
+                $"{currentUser.UserName} mentioned you in a comment",
+                JsonSerializer.Serialize(new
+                {
+                    commentId = id,
+                    sessionId = comment.SessionId,
+                    sessionName = session?.Name,
+                })));
+        await Task.WhenAll(newMentionNotificationTasks);
 
         return Results.Ok(MapToResponse(updated, newMentions));
     }
@@ -244,7 +240,7 @@ public static class SessionCommentEndpoints
                 MentionedUser = m.MentionedUser != null ? MapUserToResponse(m.MentionedUser) : null,
                 StartPosition = m.StartPosition,
                 Length = m.Length,
-            }).ToList() ??[],
+            }).ToList() ?? new List<CommentMentionResponse>(),
         };
     }
 
