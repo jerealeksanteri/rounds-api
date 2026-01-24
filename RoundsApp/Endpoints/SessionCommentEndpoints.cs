@@ -3,11 +3,13 @@
 // </copyright>
 
 using System.Security.Claims;
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using RoundsApp.DTOs.Sessions;
 using RoundsApp.DTOs.Users;
 using RoundsApp.Models;
 using RoundsApp.Repositories.IRepositories;
+using RoundsApp.Services;
 
 namespace RoundsApp.Endpoints;
 
