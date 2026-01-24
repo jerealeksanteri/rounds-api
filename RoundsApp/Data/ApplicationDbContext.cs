@@ -54,6 +54,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
     public DbSet<FriendGroupMember> FriendGroupMembers { get; set; } = null!;
 
+    public DbSet<CommentMention> CommentMentions { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -156,6 +158,19 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             entity.HasOne(sc => sc.User)
                 .WithMany()
                 .HasForeignKey(sc => sc.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<CommentMention>(entity =>
+        {
+            entity.HasOne(m => m.Comment)
+                .WithMany(c => c.Mentions)
+                .HasForeignKey(m => m.CommentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(m => m.MentionedUser)
+                .WithMany()
+                .HasForeignKey(m => m.MentionedUserId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
