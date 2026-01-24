@@ -105,23 +105,20 @@ public static class SessionCommentEndpoints
             currentUser.Id);
 
         // Send notifications to mentioned users (excluding self-mentions)
-        foreach (var mention in mentions)
-        {
-            if (mention.MentionedUserId != currentUser.Id)
-            {
-                await notificationService.CreateAndSendAsync(
-                    mention.MentionedUserId,
-                    "mention",
-                    "You were mentioned",
-                    $"{currentUser.UserName} mentioned you in a comment",
-                    JsonSerializer.Serialize(new
-                    {
-                        commentId = created.Id,
-                        sessionId = request.SessionId,
-                        sessionName = session.Name,
-                    }));
-            }
-        }
+        var mentionNotificationTasks = mentions
+            .Where(m => m.MentionedUserId != currentUser.Id)
+            .Select(m => notificationService.CreateAndSendAsync(
+                m.MentionedUserId,
+                "mention",
+                "You were mentioned",
+                $"{currentUser.UserName} mentioned you in a comment",
+                JsonSerializer.Serialize(new
+                {
+                    commentId = created.Id,
+                    sessionId = request.SessionId,
+                    sessionName = session.Name,
+                })));
+        await Task.WhenAll(mentionNotificationTasks);
 
         return Results.Created($"/api/session-comments/{created.Id}", MapToResponse(created, mentions));
     }
