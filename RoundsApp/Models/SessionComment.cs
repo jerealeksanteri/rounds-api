@@ -42,4 +42,6 @@ public class SessionComment
 
     [ForeignKey(nameof(UpdatedById))]
     public ApplicationUser? UpdatedBy { get; set; }
+
+    public ICollection<CommentMention> Mentions { get; set; } = new List<CommentMention>();
 }

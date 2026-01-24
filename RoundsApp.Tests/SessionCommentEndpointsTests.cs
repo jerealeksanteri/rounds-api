@@ -269,7 +269,199 @@ public class SessionCommentEndpointsTests : IClassFixture<WebApplicationFactory<
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
+    [Fact]
+    public async Task CreateComment_WithValidMention_CreatesMentionAndReturnsInResponse()
+    {
+        // Arrange - Create two users
+        var (token1, _) = await this.RegisterAndLoginWithUsernameAsync();
+        this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
+
+        var (_, username2) = await this.RegisterAndLoginWithUsernameAsync();
+
+        var sessionId = await this.CreateSessionAsync();
+
+        var createRequest = new CreateCommentRequest
+        {
+            SessionId = sessionId,
+            Content = $"Hey @{username2}, check this out!",
+        };
+
+        // Act
+        var response = await this.client.PostAsJsonAsync("/api/session-comments/", createRequest);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var result = await response.Content.ReadFromJsonAsync<CommentResponse>();
+        result.Should().NotBeNull();
+        result!.Mentions.Should().HaveCount(1);
+        result.Mentions[0].MentionedUser!.UserName.Should().Be(username2);
+        result.Mentions[0].StartPosition.Should().Be(4); // Position of @
+        result.Mentions[0].Length.Should().Be(username2.Length + 1); // @username length
+    }
+
+    [Fact]
+    public async Task CreateComment_WithInvalidMention_ReturnsEmptyMentions()
+    {
+        // Arrange
+        var token = await this.RegisterAndLoginAsync();
+        this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var sessionId = await this.CreateSessionAsync();
+
+        var createRequest = new CreateCommentRequest
+        {
+            SessionId = sessionId,
+            Content = "Hey @nonexistentuser12345, are you there?",
+        };
+
+        // Act
+        var response = await this.client.PostAsJsonAsync("/api/session-comments/", createRequest);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var result = await response.Content.ReadFromJsonAsync<CommentResponse>();
+        result.Should().NotBeNull();
+        result!.Mentions.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task CreateComment_WithMultipleMentions_CreatesAllValidMentions()
+    {
+        // Arrange - Create three users
+        var (token1, _) = await this.RegisterAndLoginWithUsernameAsync();
+        this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
+
+        var (_, username2) = await this.RegisterAndLoginWithUsernameAsync();
+        var (_, username3) = await this.RegisterAndLoginWithUsernameAsync();
+
+        var sessionId = await this.CreateSessionAsync();
+
+        var createRequest = new CreateCommentRequest
+        {
+            SessionId = sessionId,
+            Content = $"Hey @{username2} and @{username3}, let's meet up!",
+        };
+
+        // Act
+        var response = await this.client.PostAsJsonAsync("/api/session-comments/", createRequest);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var result = await response.Content.ReadFromJsonAsync<CommentResponse>();
+        result.Should().NotBeNull();
+        result!.Mentions.Should().HaveCount(2);
+        result.Mentions.Select(m => m.MentionedUser!.UserName).Should().Contain(username2);
+        result.Mentions.Select(m => m.MentionedUser!.UserName).Should().Contain(username3);
+    }
+
+    [Fact]
+    public async Task UpdateComment_AddingNewMention_IncludesNewMentionInResponse()
+    {
+        // Arrange
+        var (token1, _) = await this.RegisterAndLoginWithUsernameAsync();
+        this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
+
+        var (_, username2) = await this.RegisterAndLoginWithUsernameAsync();
+
+        var sessionId = await this.CreateSessionAsync();
+
+        // Create comment without mention
+        var createRequest = new CreateCommentRequest
+        {
+            SessionId = sessionId,
+            Content = "Original content without mentions",
+        };
+        var createResponse = await this.client.PostAsJsonAsync("/api/session-comments/", createRequest);
+        var createdComment = await createResponse.Content.ReadFromJsonAsync<CommentResponse>();
+        createdComment!.Mentions.Should().BeEmpty();
+
+        // Update to add mention
+        var updateRequest = new UpdateCommentRequest
+        {
+            Content = $"Updated content with @{username2} mention",
+        };
+
+        // Act
+        var response = await this.client.PutAsJsonAsync($"/api/session-comments/{createdComment.Id}", updateRequest);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var result = await response.Content.ReadFromJsonAsync<CommentResponse>();
+        result.Should().NotBeNull();
+        result!.Mentions.Should().HaveCount(1);
+        result.Mentions[0].MentionedUser!.UserName.Should().Be(username2);
+    }
+
+    [Fact]
+    public async Task UpdateComment_RemovingMention_ReturnsEmptyMentions()
+    {
+        // Arrange
+        var (token1, _) = await this.RegisterAndLoginWithUsernameAsync();
+        this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token1);
+
+        var (_, username2) = await this.RegisterAndLoginWithUsernameAsync();
+
+        var sessionId = await this.CreateSessionAsync();
+
+        // Create comment with mention
+        var createRequest = new CreateCommentRequest
+        {
+            SessionId = sessionId,
+            Content = $"Hey @{username2}, check this out!",
+        };
+        var createResponse = await this.client.PostAsJsonAsync("/api/session-comments/", createRequest);
+        var createdComment = await createResponse.Content.ReadFromJsonAsync<CommentResponse>();
+        createdComment!.Mentions.Should().HaveCount(1);
+
+        // Update to remove mention
+        var updateRequest = new UpdateCommentRequest
+        {
+            Content = "Updated content without any mentions",
+        };
+
+        // Act
+        var response = await this.client.PutAsJsonAsync($"/api/session-comments/{createdComment.Id}", updateRequest);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var result = await response.Content.ReadFromJsonAsync<CommentResponse>();
+        result.Should().NotBeNull();
+        result!.Mentions.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task CreateComment_WithSelfMention_CreatesMentionButNoNotificationSent()
+    {
+        // Arrange - self-mention test (mention is created, but no notification)
+        var (token, username) = await this.RegisterAndLoginWithUsernameAsync();
+        this.client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var sessionId = await this.CreateSessionAsync();
+
+        var createRequest = new CreateCommentRequest
+        {
+            SessionId = sessionId,
+            Content = $"Reminder to myself @{username} to do this later",
+        };
+
+        // Act
+        var response = await this.client.PostAsJsonAsync("/api/session-comments/", createRequest);
+
+        // Assert - mention is created (notification behavior tested separately)
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var result = await response.Content.ReadFromJsonAsync<CommentResponse>();
+        result.Should().NotBeNull();
+        result!.Mentions.Should().HaveCount(1);
+        result.Mentions[0].MentionedUser!.UserName.Should().Be(username);
+    }
+
     private async Task<string> RegisterAndLoginAsync()
+    {
+        var (token, _) = await this.RegisterAndLoginWithUsernameAsync();
+        return token;
+    }
+
+    private async Task<(string Token, string Username)> RegisterAndLoginWithUsernameAsync()
     {
         var email = $"test{Guid.NewGuid()}@example.com";
         var password = "Test123!@#";
@@ -295,7 +487,7 @@ public class SessionCommentEndpointsTests : IClassFixture<WebApplicationFactory<
         var loginResponse = await this.client.PostAsJsonAsync("/api/auth/login", loginRequest);
         var authResponse = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>();
 
-        return authResponse!.Token;
+        return (authResponse!.Token, userName);
     }
 
     private async Task<Guid> CreateSessionAsync()

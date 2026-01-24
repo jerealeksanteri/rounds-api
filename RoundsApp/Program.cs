@@ -100,6 +100,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 // Add Services
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IFriendGroupValidationService, FriendGroupValidationService>();
+builder.Services.AddScoped<IMentionService, MentionService>();
 
 // Add Repositories
 builder.Services.AddScoped<IAchievementRepository, AchievementRepository>();
@@ -113,6 +114,7 @@ builder.Services.AddScoped<IFriendGroupMemberRepository, FriendGroupMemberReposi
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<ISessionAchievementRepository, SessionAchievementRepository>();
 builder.Services.AddScoped<ISessionCommentRepository, SessionCommentRepository>();
+builder.Services.AddScoped<ICommentMentionRepository, CommentMentionRepository>();
 builder.Services.AddScoped<ISessionImageRepository, SessionImageRepository>();
 builder.Services.AddScoped<ISessionInviteRepository, SessionInviteRepository>();
 builder.Services.AddScoped<ISessionLocationRepository, SessionLocationRepository>();
