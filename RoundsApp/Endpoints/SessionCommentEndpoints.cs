@@ -105,10 +105,10 @@ public static class SessionCommentEndpoints
             currentUser.Id);
 
         // Send notifications to mentioned users (excluding self-mentions)
-        var mentionNotificationTasks = mentions
-            .Where(m => m.MentionedUserId != currentUser.Id)
-            .Select(m => notificationService.CreateAndSendAsync(
-                m.MentionedUserId,
+        foreach (var mention in mentions.Where(m => m.MentionedUserId != currentUser.Id))
+        {
+            await notificationService.CreateAndSendAsync(
+                mention.MentionedUserId,
                 "mention",
                 "You were mentioned",
                 $"{currentUser.UserName} mentioned you in a comment",
@@ -117,8 +117,8 @@ public static class SessionCommentEndpoints
                     commentId = created.Id,
                     sessionId = request.SessionId,
                     sessionName = session.Name,
-                })));
-        await Task.WhenAll(mentionNotificationTasks);
+                }));
+        }
 
         return Results.Created($"/api/session-comments/{created.Id}", MapToResponse(created, mentions));
     }
@@ -170,10 +170,10 @@ public static class SessionCommentEndpoints
 
         // Send notifications to newly mentioned users only
         var session = await sessionRepository.GetByIdAsync(comment.SessionId);
-        var newMentionNotificationTasks = newMentions
-            .Where(m => m.MentionedUserId != currentUser.Id && !oldMentionedUserIds.Contains(m.MentionedUserId))
-            .Select(m => notificationService.CreateAndSendAsync(
-                m.MentionedUserId,
+        foreach (var mention in newMentions.Where(m => m.MentionedUserId != currentUser.Id && !oldMentionedUserIds.Contains(m.MentionedUserId)))
+        {
+            await notificationService.CreateAndSendAsync(
+                mention.MentionedUserId,
                 "mention",
                 "You were mentioned",
                 $"{currentUser.UserName} mentioned you in a comment",
@@ -182,8 +182,8 @@ public static class SessionCommentEndpoints
                     commentId = id,
                     sessionId = comment.SessionId,
                     sessionName = session?.Name,
-                })));
-        await Task.WhenAll(newMentionNotificationTasks);
+                }));
+        }
 
         return Results.Ok(MapToResponse(updated, newMentions));
     }
